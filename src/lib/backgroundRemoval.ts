@@ -2,6 +2,10 @@ import { removeBackground } from "@imgly/background-removal";
 
 // 将文件转换为 Data URL
 export const fileToDataUrl = (file: File): Promise<string> => {
+  if (!(file instanceof File)) {
+    return Promise.reject(new Error("Invalid file object"));
+  }
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {

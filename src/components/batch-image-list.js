@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Image as ImageIcon, Clipboard } from "lucide-react"
 import { ImageCompareResult } from "@/components/ImageCompareResult"
+import { toast } from "sonner"
 
 function formatSize(size) {
   if (size > 1024 * 1024) return (size / 1024 / 1024).toFixed(2) + ' MB'
@@ -39,11 +40,24 @@ export function BatchImageList({ images }) {
   }
 
   function handleCopy(url) {
-    navigator.clipboard.writeText(url)
+    fetch(url)
+      .then(res => res.blob())
+      .then(blob => {
+        navigator.clipboard.write([
+          new ClipboardItem({
+            [blob.type]: blob
+          })
+        ])
+        toast.success("图片已复制到剪贴板")
+      })
+      .catch(err => {
+        console.error("复制失败:", err)
+        toast.error("复制失败，请重试")
+      })
   }
 
   return (
-    <div className="w-full mx-auto overflow-x-auto rounded-lg bg-background/80 p-4 shadow">
+    <div className="flex aspect-video flex-col items-center justify-start rounded-xl border-2 border-dashed p-6 shadow-md transition-colors md:p-8">
       <table className="min-w-full text-left text-sm text-gray-500">
         <thead>
           <tr className="border-b border-gray-300 text-base text-gray-300">
@@ -55,7 +69,7 @@ export function BatchImageList({ images }) {
         </thead>
         <tbody>
           {images.map((img, idx) => (
-            <tr key={idx} className="border-b border-gray-800 hover:bg-gray-100/5 transition-colors">
+            <tr key={idx} className="border-b hover:bg-gray-100/5 transition-colors">
               <td className="px-4 py-2">{idx + 1}</td>
               <td className="px-4 py-2">{img.fileName}</td>
               <td className="px-4 py-2">{formatSize(img.size)}</td>

@@ -66,15 +66,15 @@ export default function BatchPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4">
-      <div className="mx-auto mt-6 max-w-5xl md:mt-10">
+      <div className="mx-auto mt-4 md:mt-6">
         <h1 className="text-center font-dingtalk text-4xl font-bold md:text-5xl">
           批量移除图片背景
         </h1>
-        <p className="mx-auto mt-6 max-w-md text-balance text-center leading-snug md:text-lg md:leading-snug">
+        <p className="mx-auto mt-4 max-w-md text-balance text-center leading-snug md:text-lg md:leading-snug">
           选择多张<strong>图片</strong>，一键批量移除背景。
         </p>
 
-        <div className="relative mx-auto mt-20 max-w-3xl px-4 md:mt-16">
+        <div className="relative mx-auto mt-12 max-w-3xl px-4 md:mt-10">
           {!selectedFiles.length && !isProcessing ? (
             <ImageUploader 
               onImageSelected={handleFilesChange} 
@@ -100,7 +100,7 @@ export default function BatchPage() {
                 <div className="mt-4 text-center">
                   <button
                     onClick={resetSelection}
-                    className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
+                    className="inline-flex items-center gap-1 rounded-lg border border-gray-250 bg-white px-2 py-1.5 text-xs text-gray-300 shadow transition hover:bg-white/75 md:rounded-xl md:px-4 md:text-sm"
                   >
                     重新选择图片
                   </button>
