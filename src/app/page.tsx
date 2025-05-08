@@ -27,7 +27,7 @@ export default function Home() {
     };
   }, [processedImage]);
 
-  const handleFileChange = async (file: File | null) => {
+  const handleFileChange = async (files: File[] | null) => {
     try {
       // 清理之前的状态
       setIsLoading(false);
@@ -37,11 +37,14 @@ export default function Home() {
       }
       setOriginalImageDataUrl(null);
 
-      if (!file) {
+      if (!files || files.length === 0) {
         setSelectedImage(null);
         return;
       }
 
+      // 只处理第一个文件
+      const file = files[0];
+      
       // 将文件转换为 Data URL (不会过期)
       const dataUrl = await fileToDataUrl(file);
       setSelectedImage(file);
@@ -50,9 +53,7 @@ export default function Home() {
 
       try {
         // 处理图片
-        const processedUrl = await processImageBackground(
-          file,
-        );
+        const processedUrl = await processImageBackground(file);
         setProcessedImage(processedUrl);
       } catch (e) {
         console.error("背景移除失败:", e);
