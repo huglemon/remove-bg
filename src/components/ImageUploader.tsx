@@ -3,18 +3,19 @@ import { SparklesIcon } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 
 interface ImageUploaderProps {
-  onImageSelected: (file: File | null) => void;
+  onImageSelected: (files: File[] | null) => void;
+  multiple?: boolean;
 }
 
-export function ImageUploader({ onImageSelected }: ImageUploaderProps) {
+export function ImageUploader({ onImageSelected, multiple = false }: ImageUploaderProps) {
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     accept: {
       "image/*": [],
     },
-    multiple: false,
+    multiple,
     onDrop: (acceptedFiles) => {
-      if (acceptedFiles && acceptedFiles[0]) {
-        onImageSelected(acceptedFiles[0]);
+      if (acceptedFiles?.length) {
+        onImageSelected(multiple ? acceptedFiles : [acceptedFiles[0]]);
       }
     },
   });
@@ -35,9 +36,11 @@ export function ImageUploader({ onImageSelected }: ImageUploaderProps) {
         className="mb-4 h-12 px-8 text-base"
       >
         <SparklesIcon className="mr-2 h-5 w-5" />
-        选择图片
+        {multiple ? "选择多张图片" : "选择图片"}
       </Button>
-      <p className="text-gray-500">或拖放图片至此处</p>
+      <p className="text-gray-500">
+        {multiple ? "或拖放多张图片至此处" : "或拖放图片至此处"}
+      </p>
     </div>
   );
 }
