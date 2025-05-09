@@ -1,8 +1,6 @@
 import Logo from '@/components/common/logo';
 import NavLinks from '@/components/layout/navbar/nav-links';
 import NavLinksMobile from '@/components/layout/navbar/nav-links-mobile';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import NavbarBtn from '@/components/layout/navbar/nav-bar-btn';
 const Navbar = ({ fullWidth = false, showLinks = true, showDashboard = true }) => {
   return (

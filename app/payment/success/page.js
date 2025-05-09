@@ -1,64 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Suspense } from "react";
+import { PaymentSuccessContent } from "@/components/payment/payment-success-content";
 
 export default function PaymentSuccessPage() {
-  const searchParams = useSearchParams();
-  const [orderDetails, setOrderDetails] = useState({
-    orderNo: searchParams.get("orderNo") || "未知",
-    amount: searchParams.get("amount") || "0.00",
-  });
+  return (
+    <Suspense fallback={<PaymentSuccessLoading />}>
+      <PaymentSuccessContent />
+    </Suspense>
+  );
+}
 
-  useEffect(() => {
-    // 可以在这里加载订单详情
-  }, []);
-
+function PaymentSuccessLoading() {
   return (
     <div className="container mx-auto max-w-md py-12">
-      <div className="rounded-lg bg-white p-8 text-center shadow-md">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-8 w-8 text-green-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </div>
-
-        <h1 className="mb-2 text-2xl font-bold text-gray-800">支付成功</h1>
-        <p className="mb-6 text-gray-500">您的订单已成功支付，感谢您的购买！</p>
-
+      <div className="rounded-lg bg-white p-8 text-center shadow-md animate-pulse">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100/50"></div>
+        <div className="mb-2 h-8 bg-gray-200 rounded"></div>
+        <div className="mb-6 h-4 bg-gray-100 rounded"></div>
         <div className="mb-6 rounded bg-gray-50 p-4">
           <div className="mb-2 flex justify-between">
-            <span className="text-gray-500">订单号</span>
-            <span className="font-medium">{orderDetails.orderNo}</span>
+            <div className="h-4 w-20 bg-gray-100 rounded"></div>
+            <div className="h-4 w-24 bg-gray-100 rounded"></div>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-500">支付金额</span>
-            <span className="font-medium text-red-500">
-              ¥{orderDetails.amount}
-            </span>
+            <div className="h-4 w-20 bg-gray-100 rounded"></div>
+            <div className="h-4 w-16 bg-gray-100 rounded"></div>
           </div>
         </div>
-
         <div className="flex justify-center gap-4">
-          <Link href="/dashboard" passHref>
-            <Button variant="outline">返回个人中心</Button>
-          </Link>
-          <Link href="/batch" passHref>
-            <Button>开始批量抠图</Button>
-          </Link>
+          <div className="h-10 w-32 bg-gray-200 rounded"></div>
+          <div className="h-10 w-32 bg-green-100 rounded"></div>
         </div>
       </div>
     </div>

@@ -1,6 +1,5 @@
 import Logo from '@/components/common/logo';
 import Link from 'next/link';
-import { SiteConfig } from '@/lib/client';
 const SimpleFooter = () => {
 	return (
 		<div className='w-full border-t border-border/40 dark:border-border'>

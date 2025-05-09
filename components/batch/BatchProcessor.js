@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { ImageUploader } from "@/components/ImageUploader";
 import { ProcessingLoader } from "@/components/ProcessingLoader";
@@ -8,13 +8,36 @@ import { fileToDataUrl, processImageBackground } from "@/lib/backgroundRemoval";
 import { BatchImageList } from "@/components/batch-image-list";
 import { Button } from "@/components/ui/button";
 import { Archive, Loader2, RefreshCw } from "lucide-react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export function BatchProcessor() {
+export function BatchProcessor({ expiryDate }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [processedResults, setProcessedResults] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isZipping, setIsZipping] = useState(false);
+  const [authStatus, setAuthStatus] = useState("loading");
+  const router = useRouter();
+  const toastShownRef = useRef(false);
+
+  useEffect(() => {
+    // 检查会员到期状态
+    const isMemberExpired = expiryDate < Date.now();
+    
+    if (isMemberExpired && !toastShownRef.current) {
+      // 只显示一次提示
+      toastShownRef.current = true;
+      toast("会员已过期，请续费");
+      
+      // 使用router.push代替redirect
+      const redirectTimer = setTimeout(() => {
+        router.push("/dashboard");
+      }, 3000);
+    }
+    
+    setAuthStatus(isMemberExpired ? "error" : "success");
+  }, [expiryDate, router]);
 
   const handleFilesChange = async (files) => {
     if (!files?.length) {
@@ -143,54 +166,65 @@ export function BatchProcessor() {
 
   return (
     <div className="relative mx-auto mt-20 px-4 md:mt-16">
-      {!selectedFiles.length && !isProcessing ? (
-        <ImageUploader onImageSelected={handleFilesChange} multiple={true} />
-      ) : (
-        <div className="space-y-4">
-          {isProcessing && (
-            <div className="text-center">
-              <ProcessingLoader ShowBg={true} />
-              <p className="mt-2 text-sm text-gray-500">
-                正在处理第 {currentIndex + 1} 张图片，共{" "}
-                {selectedFiles.length} 张
-              </p>
-            </div>
-          )}
-
-          <BatchImageList
-            images={processedResults.map((item, i) => ({
-              ...item,
-              size: selectedFiles[i]?.size || 0,
-            }))}
-          />
-
-          {!isProcessing && (
-            <div className="mt-4 flex items-center justify-center gap-4 text-center">
-              <Button
-                variant="outline"
-                onClick={resetSelection}
-                disabled={isZipping}
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                重新选择图片
-              </Button>
-              <Button onClick={handleDownloadZip} disabled={isZipping}>
-                {isZipping ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    正在打包...
-                  </>
-                ) : (
-                  <>
-                    <Archive className="mr-2 h-4 w-4" />
-                    打包下载
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
+      {authStatus !== "success" ? (
+        <div className="text-center">
+          <ProcessingLoader ShowBg={true} title="正在检查会员有效期" text="" />
         </div>
+      ) : (
+        <>
+          {!selectedFiles.length && !isProcessing ? (
+            <ImageUploader
+              onImageSelected={handleFilesChange}
+              multiple={true}
+            />
+          ) : (
+            <div className="space-y-4">
+              {isProcessing && (
+                <div className="text-center">
+                  <ProcessingLoader ShowBg={true} />
+                  <p className="mt-2 text-sm text-gray-500">
+                    正在处理第 {currentIndex + 1} 张图片，共{" "}
+                    {selectedFiles.length} 张
+                  </p>
+                </div>
+              )}
+
+              <BatchImageList
+                images={processedResults.map((item, i) => ({
+                  ...item,
+                  size: selectedFiles[i]?.size || 0,
+                }))}
+              />
+
+              {!isProcessing && (
+                <div className="mt-4 flex items-center justify-center gap-4 text-center">
+                  <Button
+                    variant="outline"
+                    onClick={resetSelection}
+                    disabled={isZipping}
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    重新选择图片
+                  </Button>
+                  <Button onClick={handleDownloadZip} disabled={isZipping}>
+                    {isZipping ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        正在打包...
+                      </>
+                    ) : (
+                      <>
+                        <Archive className="mr-2 h-4 w-4" />
+                        打包下载
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
-} 
+}

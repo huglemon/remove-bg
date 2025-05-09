@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 const Logo = ({
   href = "/",
   showText = true,
-  showIcon = true,
   iconClassName = "w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 fill-foreground",
   textClassName = "text-lg md:text-2xl font-smiley",
 }) => {

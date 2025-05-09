@@ -1,5 +1,4 @@
 import { verifyPaymentNotify } from "@/lib/payment-service";
-import { redirect } from "next/navigation";
 
 /**
  * 处理Z-Pay支付跳转回调

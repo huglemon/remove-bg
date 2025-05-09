@@ -1,12 +1,16 @@
 import { getCurrentSession } from "@/app/actions/user";
 import { LogoutButton } from "@/components/auth/logout-button";
-import { Button } from "@/components/ui/button";
-import { Crown } from "lucide-react";
 import { PaymentButton } from "@/components/payment/payment-button";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const { session } = await getCurrentSession();
 
+  // 如果没有会话，重定向到登录页面
+  if (!session) {
+    redirect("/auth/login");
+  }
+  console.log(session);
   const { user } = session;
 
   return (

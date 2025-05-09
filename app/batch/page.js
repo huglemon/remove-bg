@@ -2,6 +2,7 @@ import { BatchHeader } from "@/components/batch/BatchHeader";
 import { BatchProcessor } from "@/components/batch/BatchProcessor";
 import { getCurrentSession } from "@/app/actions/user";
 import { redirect } from "next/navigation";
+import { toast } from "sonner";
 
 export default async function BatchPage() {
   // 获取用户会话
@@ -12,10 +13,13 @@ export default async function BatchPage() {
     redirect("/auth/login");
   }
 
+  const { expiryDate } = session;
+  console.log("expiryDate", expiryDate);
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 pb-32">
       <BatchHeader />
-      <BatchProcessor />
+      <BatchProcessor expiryDate={expiryDate} />
     </div>
   );
-} 
+}
