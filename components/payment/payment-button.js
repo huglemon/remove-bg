@@ -4,14 +4,10 @@ import { Button } from "@/components/ui/button";
 import { queryOrderStatus, createPaymentForm } from "@/lib/payment-service";
 
 export function PaymentButton({ uid, subject = "测试商品", amount = 1 }) {
-  if (!uid) {
-    return null;
-  }
-
-  if (amount !== 1 && amount !== 990 && amount !== 6600) {
-    return null;
-  }
-
+  // 验证输入参数是否有效
+  const isValidAmount = amount === 1 || amount === 990 || amount === 6600;
+  const isValid = uid && isValidAmount;
+  
   const [loading, setLoading] = useState(false);
   const [orderNo, setOrderNo] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -103,6 +99,11 @@ export function PaymentButton({ uid, subject = "测试商品", amount = 1 }) {
     setPaymentStatus(null);
     setPolling(false);
   };
+
+  // 如果参数无效，则不渲染任何内容
+  if (!isValid) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col items-center gap-4">

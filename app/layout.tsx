@@ -1,4 +1,3 @@
-import Logo from "@/components/ui/logo";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster as RadixToaster } from "@/components/ui/toaster";
