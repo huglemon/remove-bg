@@ -11,9 +11,9 @@ export function ModeSwitch() {
   const [isBatchMode, setIsBatchMode] = useState(pathname === "/batch")
 
   useEffect(() => {
-    if (isBatchMode && pathname !== "/batch") {
+    if (isBatchMode && pathname === "/") {
       router.push("/batch")
-    } else if (!isBatchMode && pathname !== "/") {
+    } else if (!isBatchMode && pathname === "/batch") {
       router.push("/")
     }
   }, [isBatchMode, pathname, router])
