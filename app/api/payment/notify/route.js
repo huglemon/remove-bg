@@ -1,6 +1,9 @@
 import { getOrder, updateOrderStatus } from "@/app/actions/order";
 import { verifyPaymentNotify } from "@/lib/payment-service";
 import { extendMemberExpiryDate } from "@/app/actions/user";
+
+export const dynamic = 'force-dynamic';
+
 /**
  * 处理Z-Pay支付异步通知
  */
@@ -70,7 +73,7 @@ export async function GET(request) {
         await extendMemberExpiryDate(order.uid, 365);
       }
 
-      await updateOrderStatus(order.id, "paid");
+      await updateOrderStatus(order.out_trade_no, "paid");
 
       // 保存支付信息到日志
       console.log("支付成功:", {
