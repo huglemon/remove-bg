@@ -2,6 +2,8 @@ import { getCurrentSession } from "@/app/actions/user";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { PaymentButton } from "@/components/payment/payment-button";
 import { redirect } from "next/navigation";
+import { Crown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardPage() {
   const { session } = await getCurrentSession();
@@ -10,8 +12,7 @@ export default async function DashboardPage() {
   if (!session) {
     redirect("/auth/login");
   }
-  console.log(session);
-  const { user } = session;
+  const { user, expiryDate } = session;
 
   return (
     <div className="mx-auto max-w-6xl p-4 md:p-8">
@@ -49,14 +50,34 @@ export default async function DashboardPage() {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2">
                 <strong className="min-w-24">账户等级:</strong>
-                <span className="flex-1">免费用户</span>
+                <span className="flex-1">
+                  {expiryDate > Date.now() ? "付费用户" : "免费用户"}
+                </span>
               </div>
-              <PaymentButton uid={user.id} />
+              {expiryDate > Date.now() ? (
+                <PaymentButton uid={user.id} />
+              ) : (
+                <Button
+                  size="sm"
+                  className="cursor-pointer bg-amber-500 text-white hover:bg-amber-600"
+                >
+                  <Crown className="mr-1 h-4 w-4" />
+                  <span>升级</span>
+                </Button>
+              )}
               {/* <Button size="sm" className="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white">
                 <Crown className="mr-1 h-4 w-4" />
                 <span>升级</span>
               </Button> */}
             </div>
+            {expiryDate > Date.now() && (
+              <p className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <strong className="min-w-24">有效期至:</strong>
+                <span className="flex-1">
+                  {new Date(expiryDate).toLocaleDateString("zh-CN")}
+                </span>
+              </p>
+            )}
             <p className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <strong className="min-w-24">注册日期:</strong>
               <span className="flex-1">

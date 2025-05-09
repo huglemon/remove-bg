@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { queryOrderStatus, createPaymentForm } from "@/lib/payment-service";
 
-export function PaymentButton({ uid, subject = "测试商品", amount = 1 }) {
+export function PaymentButton({ uid, subject = "测试商品", amount = 990 }) {
   // 验证输入参数是否有效
   const isValidAmount = amount === 1 || amount === 990 || amount === 6600;
   const isValid = uid && isValidAmount;
@@ -114,7 +114,7 @@ export function PaymentButton({ uid, subject = "测试商品", amount = 1 }) {
             disabled={loading}
             className="bg-green-500 px-8 hover:bg-green-600"
           >
-            {loading ? "处理中..." : `微信支付 ¥${amount / 100}元`}
+            {loading ? "处理中..." : `微信支付 ¥${amount / 100}`}
           </Button>
         )}
 
