@@ -1,5 +1,7 @@
 import { verifyPaymentNotify } from "@/lib/payment-service";
 
+export const dynamic = 'force-dynamic';
+
 /**
  * 处理Z-Pay支付跳转回调
  */
