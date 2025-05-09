@@ -1,68 +1,76 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { toast } from "sonner"
-import { ImageUploader } from "@/components/ImageUploader"
-import { ProcessingLoader } from "@/components/ProcessingLoader"
-import { ImageCompareResult } from "@/components/ImageCompareResult"
-import { ProcessingError } from "@/components/ProcessingError"
-import { fileToDataUrl, processImageBackground } from "@/lib/backgroundRemoval"
-import { BatchImageList } from "@/components/batch-image-list"
+import { useState } from "react";
+import { toast } from "sonner";
+import { ImageUploader } from "@/components/ImageUploader";
+import { ProcessingLoader } from "@/components/ProcessingLoader";
+import HomepageImage1 from "@/components/images/homepage-image-1";
+import HomepageImage2 from "@/components/images/homepage-image-2";
+import { ImageCompareResult } from "@/components/ImageCompareResult";
+import { ProcessingError } from "@/components/ProcessingError";
+import { fileToDataUrl, processImageBackground } from "@/lib/backgroundRemoval";
+import { BatchImageList } from "@/components/batch-image-list";
 
 export default function BatchPage() {
-  const [selectedFiles, setSelectedFiles] = useState([])
-  const [processedResults, setProcessedResults] = useState([])
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [processedResults, setProcessedResults] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleFilesChange = async (files) => {
     if (!files?.length) {
-      setSelectedFiles([])
-      setProcessedResults([])
-      return
+      setSelectedFiles([]);
+      setProcessedResults([]);
+      return;
     }
 
-    setSelectedFiles(files)
-    setProcessedResults([])
-    setCurrentIndex(0)
-    setIsProcessing(true)
+    setSelectedFiles(files);
+    setProcessedResults([]);
+    setCurrentIndex(0);
+    setIsProcessing(true);
 
     try {
       for (let i = 0; i < files.length; i++) {
-        setCurrentIndex(i)
-        const file = files[i]
-        const dataUrl = await fileToDataUrl(file)
-        
+        setCurrentIndex(i);
+        const file = files[i];
+        const dataUrl = await fileToDataUrl(file);
+
         try {
-          const processedUrl = await processImageBackground(file)
-          setProcessedResults(prev => [...prev, {
-            originalImage: dataUrl,
-            processedImage: processedUrl,
-            fileName: file.name,
-            status: 'success'
-          }])
+          const processedUrl = await processImageBackground(file);
+          setProcessedResults((prev) => [
+            ...prev,
+            {
+              originalImage: dataUrl,
+              processedImage: processedUrl,
+              fileName: file.name,
+              status: "success",
+            },
+          ]);
         } catch (error) {
-          console.error(`处理图片 ${file.name} 失败:`, error)
-          setProcessedResults(prev => [...prev, {
-            originalImage: dataUrl,
-            fileName: file.name,
-            status: 'error'
-          }])
+          console.error(`处理图片 ${file.name} 失败:`, error);
+          setProcessedResults((prev) => [
+            ...prev,
+            {
+              originalImage: dataUrl,
+              fileName: file.name,
+              status: "error",
+            },
+          ]);
         }
       }
     } catch (error) {
-      console.error("批量处理失败:", error)
-      toast.error("批量处理失败，请重试")
+      console.error("批量处理失败:", error);
+      toast.error("批量处理失败，请重试");
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const resetSelection = () => {
-    setSelectedFiles([])
-    setProcessedResults([])
-    setCurrentIndex(0)
-  }
+    setSelectedFiles([]);
+    setProcessedResults([]);
+    setCurrentIndex(0);
+  };
 
   return (
     <div className="mx-auto max-w-4xl px-4">
@@ -74,10 +82,16 @@ export default function BatchPage() {
           选择多张<strong>图片</strong>，一键批量移除背景。
         </p>
 
-        <div className="relative mx-auto mt-12 max-w-3xl px-4 md:mt-10">
+        <div className="relative mx-auto mt-20 px-4 md:mt-16">
+          <div className="pointer-events-none absolute left-[-40px] top-[-185px] flex w-[200px] items-center md:-left-[calc(min(30vw,350px))] md:-top-20 md:w-[390px]">
+            <HomepageImage1 />
+          </div>
+          <div className="pointer-events-none absolute right-[20px] top-[-110px] flex w-[70px] justify-center md:-right-[calc(min(30vw,350px))] md:-top-5 md:w-[390px]">
+            <HomepageImage2 />
+          </div>
           {!selectedFiles.length && !isProcessing ? (
-            <ImageUploader 
-              onImageSelected={handleFilesChange} 
+            <ImageUploader
+              onImageSelected={handleFilesChange}
               multiple={true}
             />
           ) : (
@@ -86,15 +100,18 @@ export default function BatchPage() {
                 <div className="text-center">
                   <ProcessingLoader />
                   <p className="mt-2 text-sm text-gray-500">
-                    正在处理第 {currentIndex + 1} 张图片，共 {selectedFiles.length} 张
+                    正在处理第 {currentIndex + 1} 张图片，共{" "}
+                    {selectedFiles.length} 张
                   </p>
                 </div>
               )}
 
-              <BatchImageList images={processedResults.map((item, i) => ({
-                ...item,
-                size: selectedFiles[i]?.size || 0
-              }))} />
+              <BatchImageList
+                images={processedResults.map((item, i) => ({
+                  ...item,
+                  size: selectedFiles[i]?.size || 0,
+                }))}
+              />
 
               {!isProcessing && (
                 <div className="mt-4 text-center">
@@ -111,5 +128,5 @@ export default function BatchPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
