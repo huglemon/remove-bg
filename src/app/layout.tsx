@@ -41,12 +41,20 @@ export default function RootLayout({
 }>) {
   return (
     <html suppressHydrationWarning lang="zh">
+      <head>
+        <script
+          async
+          defer
+          data-website-id="e132eb98-1c88-44e4-ab72-128b4618c250"
+          src="https://analytics.inwind.cn/script.js"
+        ></script>
+      </head>
       <body
         className={cn(
           geistSans.variable,
           geistMono.variable,
           dingTalkFont.variable,
-          `flex min-h-screen flex-col bg-[length:30px_30px] bg-[linear-gradient(45deg,#eaeaea_25%,transparent_25%,transparent_75%,#eaeaea_75%,#eaeaea),linear-gradient(45deg,#eaeaea_25%,transparent_25%,transparent_75%,#eaeaea_75%,#eaeaea)] bg-[position:0_0,15px_15px] text-gray-900 antialiased`,
+          `flex min-h-screen flex-col bg-[linear-gradient(45deg,#eaeaea_25%,transparent_25%,transparent_75%,#eaeaea_75%,#eaeaea),linear-gradient(45deg,#eaeaea_25%,transparent_25%,transparent_75%,#eaeaea_75%,#eaeaea)] bg-[length:30px_30px] bg-[position:0_0,15px_15px] text-gray-900 antialiased`,
         )}
       >
         <header className="relative py-6">
