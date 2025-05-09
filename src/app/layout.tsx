@@ -1,5 +1,3 @@
-import Image from "next/image";
-import XIcon from "@/components/icons/x";
 import Logo from "@/components/ui/logo";
 import type { Metadata } from "next";
 import "./globals.css";
