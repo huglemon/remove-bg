@@ -24,6 +24,7 @@ export function BatchProcessor({ expiryDate }) {
   useEffect(() => {
     // 检查会员到期状态
     const isMemberExpired = expiryDate < Date.now();
+    let timer;
     
     if (isMemberExpired && !toastShownRef.current) {
       // 只显示一次提示
@@ -31,12 +32,17 @@ export function BatchProcessor({ expiryDate }) {
       toast("会员已过期，请续费");
       
       // 使用router.push代替redirect
-      const redirectTimer = setTimeout(() => {
+      timer = setTimeout(() => {
         router.push("/dashboard");
       }, 3000);
     }
     
     setAuthStatus(isMemberExpired ? "error" : "success");
+    
+    // 清理函数
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [expiryDate, router]);
 
   const handleFilesChange = async (files) => {
