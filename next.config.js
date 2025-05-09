@@ -14,12 +14,14 @@ const nextConfig = {
     }
     return config;
   },
-  // 其他 Next.js 配置...
+  // 外部包配置 - 从experimental移至根级别
+  serverExternalPackages: ['@imgly/background-removal'],
+  // 其他 Next.js 配置
   images: {
     domains: ['rmbg.hellokaton.me'],
   },
   experimental: {
-    serverComponentsExternalPackages: ['@imgly/background-removal'],
+    // 新的实验性选项可以放在这里
   },
 };
 

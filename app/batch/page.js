@@ -2,7 +2,6 @@ import { BatchHeader } from "@/components/batch/BatchHeader";
 import { BatchProcessor } from "@/components/batch/BatchProcessor";
 import { getCurrentSession } from "@/app/actions/user";
 import { redirect } from "next/navigation";
-import { toast } from "sonner";
 
 export default async function BatchPage() {
   // 获取用户会话
