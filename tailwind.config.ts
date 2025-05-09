@@ -12,7 +12,13 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        dingtalk: ["var(--font-dingtalk)"],
+        smiley: ["var(--font-smiley)"],
+        sans: ["var(--font-geist-sans)", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "monospace"],
+      },
+      letterSpacing: {
+        'smiley-wide': '0.05em',
+        'smiley-wider': '0.1em',
       },
       borderRadius: {
         lg: "var(--radius)",

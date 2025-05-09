@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, RefreshCw } from "lucide-react";
 import {
   ReactCompareSlider,
   ReactCompareSliderImage,
@@ -30,8 +30,19 @@ export function ImageCompareResult({
   };
 
   return (
-    <div className="rounded-xl border-2 border-gray-300 bg-white p-4 shadow-md">
-      <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
+    <div className="overflow-hidden rounded-lg">
+      <div className="px-4 pt-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-medium text-gray-800">处理结果</h3>
+          <div className="flex items-center space-x-1 text-sm text-gray-600">
+            <span>👈 原图</span>
+            <span>|</span>
+            <span>处理后 👉</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="relative w-full p-4" style={{ aspectRatio: "16/9" }}>
         <ReactCompareSlider
           itemOne={
             <ReactCompareSliderImage
@@ -41,7 +52,7 @@ export function ImageCompareResult({
                 objectFit: "contain",
                 width: "100%",
                 height: "100%",
-                backgroundColor: "#f5f5f5",
+                backgroundColor: "rgba(248, 250, 252, 0.5)",
               }}
             />
           }
@@ -53,11 +64,11 @@ export function ImageCompareResult({
                 objectFit: "contain",
                 width: "100%",
                 height: "100%",
-                backgroundColor: "#f5f5f5",
+                backgroundColor: "rgba(248, 250, 252, 0.5)",
               }}
             />
           }
-          className="rounded-lg"
+          className="rounded-md overflow-hidden shadow-sm"
           style={{
             height: "100%",
             width: "100%",
@@ -65,17 +76,25 @@ export function ImageCompareResult({
           position={50}
         />
       </div>
-      <div className="mt-4 flex justify-center space-x-4">
-        <Button onClick={onReset} className="px-8">
-          选择其他图片
-        </Button>
-        <Button
-          onClick={handleDownload}
-          className="bg-green-500 px-8 hover:bg-green-600"
-        >
-          <Download className="mr-2 h-4 w-4" />
-          下载结果
-        </Button>
+
+      <div className="bg-gray-50/50 backdrop-blur-sm p-4">
+        <div className="flex flex-col space-y-3 sm:flex-row sm:justify-between sm:space-x-4 sm:space-y-0">
+          <Button 
+            onClick={onReset} 
+            variant="outline"
+            className="border-gray-300/50 bg-white/50 text-gray-700 backdrop-blur-sm hover:bg-white/70"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            重新上传
+          </Button>
+          <Button
+            onClick={handleDownload}
+            className="bg-gradient-to-r from-blue-600/90 to-violet-600/90 backdrop-blur-sm hover:from-blue-700/90 hover:to-violet-700/90"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            下载处理结果
+          </Button>
+        </div>
       </div>
     </div>
   );
