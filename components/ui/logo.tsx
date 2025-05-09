@@ -11,7 +11,7 @@ export default function Logo(props: React.ComponentProps<"div">) {
           
         className="mr-2"
       />
-      <span className="text-2xl font-dingtalk">乘风智能抠图</span>
+      <span className="text-2xl font-smiley">乘风智能抠图</span>
     </div>
   );
 }

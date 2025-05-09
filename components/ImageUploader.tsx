@@ -7,7 +7,10 @@ interface ImageUploaderProps {
   multiple?: boolean;
 }
 
-export function ImageUploader({ onImageSelected, multiple = false }: ImageUploaderProps) {
+export function ImageUploader({
+  onImageSelected,
+  multiple = false,
+}: ImageUploaderProps) {
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     accept: {
       "image/*": [],
@@ -23,9 +26,9 @@ export function ImageUploader({ onImageSelected, multiple = false }: ImageUpload
   return (
     <div
       {...getRootProps()}
-      className={`flex aspect-video flex-col items-center justify-center rounded-xl border-2 border-dashed ${
+      className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed ${
         isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"
-      } bg-white p-6 shadow-md transition-colors md:p-8`}
+      } bg-white p-10 md:p-20 shadow-md transition-colors`}
     >
       <input {...getInputProps()} />
       <Button

@@ -4,16 +4,18 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ImageUploader } from "@/components/ImageUploader";
 import { ProcessingLoader } from "@/components/ProcessingLoader";
-import HomepageImage1 from "@/components/images/homepage-image-1";
-import HomepageImage2 from "@/components/images/homepage-image-2";
 import { fileToDataUrl, processImageBackground } from "@/lib/backgroundRemoval";
 import { BatchImageList } from "@/components/batch-image-list";
+
+import { Button } from "@/components/ui/button";
+import { Crown, Archive, Loader2, RefreshCw } from "lucide-react";
 
 export default function BatchPage() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [processedResults, setProcessedResults] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isZipping, setIsZipping] = useState(false);
 
   const handleFilesChange = async (files) => {
     if (!files?.length) {
@@ -70,60 +72,128 @@ export default function BatchPage() {
     setCurrentIndex(0);
   };
 
+  const handleDownloadZip = async () => {
+    if (!processedResults.length) return;
+    
+    setIsZipping(true);
+    toast.info("正在打包图片，请稍候...");
+
+    try {
+      // 动态导入jszip库
+      const JSZip = (await import('jszip')).default;
+      const zip = new JSZip();
+      
+      // 创建以日期命名的文件夹
+      const date = new Date();
+      const folderName = `背景去除_${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      const folder = zip.folder(folderName);
+      
+      // 添加处理好的图片到压缩包
+      const successImages = processedResults.filter(result => result.status === "success" && result.processedImage);
+      const totalImages = successImages.length;
+      
+      for (let i = 0; i < totalImages; i++) {
+        const result = successImages[i];
+        try {
+          const response = await fetch(result.processedImage);
+          const blob = await response.blob();
+          // 获取原始文件名（不带扩展名）
+          const originalName = result.fileName.substring(0, result.fileName.lastIndexOf('.')) || `image-${i + 1}`;
+          const fileName = `${originalName}-无背景.png`;
+          folder.file(fileName, blob);
+          
+          // 更新打包进度
+          if (i % 3 === 0 || i === totalImages - 1) {
+            toast.info(`正在打包: ${i + 1}/${totalImages} 张图片`);
+          }
+        } catch (error) {
+          console.error(`添加图片 ${result.fileName} 到压缩包失败:`, error);
+        }
+      }
+
+      // 生成压缩包
+      toast.info("正在生成压缩包，请稍候...");
+      const content = await zip.generateAsync({ 
+        type: 'blob',
+        compression: "DEFLATE",
+        compressionOptions: {
+          level: 6
+        }
+      });
+      
+      // 创建下载链接
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(content);
+      link.download = `${folderName}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success("图片已打包下载完成");
+    } catch (error) {
+      console.error("打包下载失败:", error);
+      toast.error("打包下载失败，请重试");
+    } finally {
+      setIsZipping(false);
+    }
+  };
+
   return (
-    <div className="mx-auto max-w-4xl px-4">
-      <div className="mx-auto mt-4 md:mt-6">
-        <h1 className="text-center font-dingtalk text-4xl font-bold md:text-5xl">
+    <div className="mx-auto max-w-4xl px-4 py-10 pb-32">
+      <div className="mx-auto mt-4 flex flex-col items-center justify-center gap-2 md:mt-6">
+        <Crown className="mb-4 inline-block h-12 w-12 text-amber-500" />
+        <h1 className="font-smiley text-center text-4xl font-bold md:text-5xl">
           批量移除图片背景
         </h1>
         <p className="mx-auto mt-4 max-w-md text-balance text-center leading-snug md:text-lg md:leading-snug">
           选择多张<strong>图片</strong>，一键批量移除背景。
         </p>
+      </div>
+      <div className="relative mx-auto mt-20 px-4 md:mt-16">
+        {!selectedFiles.length && !isProcessing ? (
+          <ImageUploader onImageSelected={handleFilesChange} multiple={true} />
+        ) : (
+          <div className="space-y-4">
+            {isProcessing && (
+              <div className="text-center">
+                <ProcessingLoader ShowBg={true} />
+                <p className="mt-2 text-sm text-gray-500">
+                  正在处理第 {currentIndex + 1} 张图片，共{" "}
+                  {selectedFiles.length} 张
+                </p>
+              </div>
+            )}
 
-        <div className="relative mx-auto mt-20 px-4 md:mt-16">
-          <div className="pointer-events-none absolute left-[-40px] top-[-185px] flex w-[200px] items-center md:-left-[calc(min(30vw,350px))] md:-top-20 md:w-[390px]">
-            <HomepageImage1 />
-          </div>
-          <div className="pointer-events-none absolute right-[20px] top-[-110px] flex w-[70px] justify-center md:-right-[calc(min(30vw,350px))] md:-top-5 md:w-[390px]">
-            <HomepageImage2 />
-          </div>
-          {!selectedFiles.length && !isProcessing ? (
-            <ImageUploader
-              onImageSelected={handleFilesChange}
-              multiple={true}
+            <BatchImageList
+              images={processedResults.map((item, i) => ({
+                ...item,
+                size: selectedFiles[i]?.size || 0,
+              }))}
             />
-          ) : (
-            <div className="space-y-4">
-              {isProcessing && (
-                <div className="text-center">
-                  <ProcessingLoader />
-                  <p className="mt-2 text-sm text-gray-500">
-                    正在处理第 {currentIndex + 1} 张图片，共{" "}
-                    {selectedFiles.length} 张
-                  </p>
-                </div>
-              )}
 
-              <BatchImageList
-                images={processedResults.map((item, i) => ({
-                  ...item,
-                  size: selectedFiles[i]?.size || 0,
-                }))}
-              />
-
-              {!isProcessing && (
-                <div className="mt-4 text-center">
-                  <button
-                    onClick={resetSelection}
-                    className="inline-flex items-center gap-1 rounded-lg border border-gray-250 bg-white px-2 py-1.5 text-xs text-gray-300 shadow transition hover:bg-white/75 md:rounded-xl md:px-4 md:text-sm"
-                  >
-                    重新选择图片
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+            {!isProcessing && (
+              <div className="mt-4 flex items-center justify-center gap-4 text-center">
+                <Button variant="outline" onClick={resetSelection} disabled={isZipping}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  重新选择图片
+                </Button>
+                <Button onClick={handleDownloadZip} disabled={isZipping}>
+                  {isZipping ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      正在打包...
+                    </>
+                  ) : (
+                    <>
+                      <Archive className="mr-2 h-4 w-4" />
+                      打包下载
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

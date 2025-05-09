@@ -57,7 +57,7 @@ export function BatchImageList({ images }) {
   }
 
   return (
-    <div className="bg-white flex aspect-video flex-col items-center justify-start rounded-xl border-2 border-dashed p-6 shadow-md transition-colors md:p-8">
+    <div className="bg-white flex flex-col items-center justify-start rounded-xl border-2 border-dashed p-6 shadow-md transition-colors md:p-8">
       <table className="min-w-full text-left text-sm text-gray-500">
         <thead>
           <tr className="border-b border-gray-300 text-base text-gray-300">
