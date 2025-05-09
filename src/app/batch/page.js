@@ -6,8 +6,6 @@ import { ImageUploader } from "@/components/ImageUploader";
 import { ProcessingLoader } from "@/components/ProcessingLoader";
 import HomepageImage1 from "@/components/images/homepage-image-1";
 import HomepageImage2 from "@/components/images/homepage-image-2";
-import { ImageCompareResult } from "@/components/ImageCompareResult";
-import { ProcessingError } from "@/components/ProcessingError";
 import { fileToDataUrl, processImageBackground } from "@/lib/backgroundRemoval";
 import { BatchImageList } from "@/components/batch-image-list";
 
