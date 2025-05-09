@@ -2,6 +2,7 @@ import { getCurrentSession } from "@/app/actions/user";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { Button } from "@/components/ui/button";
 import { Crown } from "lucide-react";
+import { PaymentButton } from "@/components/payment/payment-button";
 
 export default async function DashboardPage() {
   const { session } = await getCurrentSession();
@@ -46,10 +47,11 @@ export default async function DashboardPage() {
                 <strong className="min-w-24">账户等级:</strong>
                 <span className="flex-1">免费用户</span>
               </div>
-              <Button size="sm" className="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white">
+              <PaymentButton uid={user.id} />
+              {/* <Button size="sm" className="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white">
                 <Crown className="mr-1 h-4 w-4" />
                 <span>升级</span>
-              </Button>
+              </Button> */}
             </div>
             <p className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <strong className="min-w-24">注册日期:</strong>
