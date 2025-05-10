@@ -29,7 +29,7 @@ export function LoginForm() {
 
 	return (
 		<form
-			className='space-y-6'
+			className='space-y-6 bg-white p-8 rounded-lg shadow-md'
 			onSubmit={handleSubmit}
 		>
 			{error && <div className='bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded'>{error}</div>}
