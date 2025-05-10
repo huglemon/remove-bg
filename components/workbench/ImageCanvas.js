@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, forwardRef } from "react";
+import { useState, useRef, useEffect, forwardRef, useCallback } from "react";
 
 // 水印绘制函数
 export function drawWatermark(ctx, width, height) {
@@ -89,8 +89,8 @@ const ImageCanvas = forwardRef(function ImageCanvas(
     if (externalOffsetY !== undefined) setOffsetY(externalOffsetY);
   }, [externalOffsetY]);
 
-  // 重绘画布
-  const drawCanvas = () => {
+  // 重绘画布 - 使用 useCallback 包装
+  const drawCanvas = useCallback(() => {
     if (!src || !internalCanvasRef.current) return;
     const canvas = internalCanvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -262,10 +262,10 @@ const ImageCanvas = forwardRef(function ImageCanvas(
       drawWatermark(ctx, w, h);
     };
     img.src = src;
-  };
+  }, [src, width, height, ratio, background, zoom, offsetX, offsetY]);
 
-  // 处理鼠标事件
-  const handleMouseDown = (e) => {
+  // 处理鼠标事件 - 使用 useCallback 包装
+  const handleMouseDown = useCallback((e) => {
     const canvas = internalCanvasRef.current;
     if (!canvas) return;
 
@@ -288,9 +288,9 @@ const ImageCanvas = forwardRef(function ImageCanvas(
       // 设置cursor为grabbing
       canvas.style.cursor = "grabbing";
     }
-  };
+  }, []);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = useCallback((e) => {
     // 鼠标悬停在图像上时改变鼠标样式
     const canvas = internalCanvasRef.current;
     if (!canvas) return;
@@ -330,16 +330,16 @@ const ImageCanvas = forwardRef(function ImageCanvas(
         onOffsetChange(newOffsetX, newOffsetY);
       }
     }
-  };
+  }, [isDragging, startDragX, startDragY, onOffsetChange]);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     if (isDragging) {
       setIsDragging(false);
       if (internalCanvasRef.current) {
         internalCanvasRef.current.style.cursor = "default";
       }
     }
-  };
+  }, [isDragging]);
 
   // 在组件卸载时移除鼠标事件监听器
   useEffect(() => {
@@ -357,12 +357,12 @@ const ImageCanvas = forwardRef(function ImageCanvas(
       }
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, startDragX, startDragY, onOffsetChange, handleMouseDown, handleMouseMove, handleMouseUp]);
+  }, [handleMouseDown, handleMouseMove, handleMouseUp]);
 
   // 在各种参数变化时重绘
   useEffect(() => {
     drawCanvas();
-  }, [src, width, height, ratio, background, zoom, offsetX, offsetY, drawCanvas]);
+  }, [drawCanvas]);
 
   // 当比例或尺寸变化时重置偏移量
   useEffect(() => {
