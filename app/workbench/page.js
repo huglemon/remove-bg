@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 
 const backgroundColors = [
   // 透明/马赛克
@@ -152,12 +153,6 @@ const actionButtons = [
     ratio: null, // 保持原始比例
   },
   {
-    key: "crop",
-    label: "裁剪到边缘",
-    icon: "/logo/crop.svg",
-    ratio: null, // 保持原始比例但裁剪到边缘
-  },
-  {
     key: "id-1",
     label: "一寸头像",
     icon: "/logo/id.svg",
@@ -196,7 +191,7 @@ const actionButtons = [
 ];
 
 // Canvas 画布组件
-function ImageCanvas({ src, width = 420, height = 520, ratio = null, background = "transparent" }) {
+function ImageCanvas({ src, width = 420, height = 520, ratio = null, background = "transparent", zoom = 1 }) {
   const canvasRef = useRef(null);
 
   // 重绘画布
@@ -332,24 +327,19 @@ function ImageCanvas({ src, width = 420, height = 520, ratio = null, background 
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = function() {
-      let drawWidth, drawHeight, x, y;
+      // 基础缩放比例 - 确保图片完全可见
+      const baseScale = Math.min(w / img.width, h / img.height);
       
-      // 是否裁剪到边缘
-      if (background === "crop") {
-        // 裁剪到边缘：图像将填充整个画布
-        const scale = Math.max(w / img.width, h / img.height);
-        drawWidth = img.width * scale;
-        drawHeight = img.height * scale;
-        x = (w - drawWidth) / 2;
-        y = (h - drawHeight) / 2;
-      } else {
-        // 保持完整：图像将完全可见
-        const scale = Math.min(w / img.width, h / img.height);
-        drawWidth = img.width * scale;
-        drawHeight = img.height * scale;
-        x = (w - drawWidth) / 2;
-        y = (h - drawHeight) / 2;
-      }
+      // 应用用户的缩放因子
+      const finalScale = baseScale * zoom;
+      
+      // 计算绘制尺寸
+      const drawWidth = img.width * finalScale;
+      const drawHeight = img.height * finalScale;
+      
+      // 居中定位
+      const x = (w - drawWidth) / 2;
+      const y = (h - drawHeight) / 2;
       
       ctx.drawImage(img, x, y, drawWidth, drawHeight);
     };
@@ -358,7 +348,7 @@ function ImageCanvas({ src, width = 420, height = 520, ratio = null, background 
 
   useEffect(() => {
     drawCanvas();
-  }, [src, width, height, ratio, background]);
+  }, [src, width, height, ratio, background, zoom]);
 
   return (
     <canvas
@@ -374,8 +364,13 @@ function ImageCanvas({ src, width = 420, height = 520, ratio = null, background 
 export default function WorkbenchPage() {
   const [selectedBg, setSelectedBg] = useState("transparent");
   const [selectedRatio, setSelectedRatio] = useState(null);
-  const [canvasWidth, setCanvasWidth] = useState(420);
-  const [canvasHeight, setCanvasHeight] = useState(520);
+  const [zoomLevel, setZoomLevel] = useState(1); // 默认缩放级别: 1倍
+  
+  // 保存原始尺寸，防止重复调整导致画布不断缩小
+  const [originalWidth] = useState(420);
+  const [originalHeight] = useState(520);
+  const [canvasWidth, setCanvasWidth] = useState(originalWidth);
+  const [canvasHeight, setCanvasHeight] = useState(originalHeight);
   
   // 用于下载的引用
   const canvasRef = useRef(null);
@@ -403,24 +398,60 @@ export default function WorkbenchPage() {
     document.body.removeChild(a);
   };
   
-  // 处理比例按钮点击
+  // 处理比例按钮点击 - 修复不断缩小问题
   const handleRatioClick = (button) => {
+    // 更新选中比例
     setSelectedRatio(button.ratio);
+    
     if (button.ratio) {
-      // 调整画布尺寸以匹配比例
-      if (canvasWidth / canvasHeight > button.ratio) {
-        setCanvasWidth(Math.round(canvasHeight * button.ratio));
+      // 总是从原始尺寸开始计算，确保不会逐渐缩小
+      if (originalWidth / originalHeight > button.ratio) {
+        // 以高度为基准计算宽度
+        setCanvasWidth(Math.round(originalHeight * button.ratio));
+        setCanvasHeight(originalHeight);
       } else {
-        setCanvasHeight(Math.round(canvasWidth / button.ratio));
+        // 以宽度为基准计算高度
+        setCanvasWidth(originalWidth);
+        setCanvasHeight(Math.round(originalWidth / button.ratio));
       }
+    } else {
+      // 还原为原始尺寸
+      setCanvasWidth(originalWidth);
+      setCanvasHeight(originalHeight);
     }
+  };
+
+  // 处理缩放滑块变化
+  const handleZoomChange = (value) => {
+    setZoomLevel(value[0]);
   };
 
   return (
     <div className="flex h-screen bg-gray-50">
       {/* 左侧图片预览区 */}
       <div className="relative flex flex-1 flex-col items-center justify-center p-8">
-        {/* 图片区域 - 替换为 Canvas */}
+        {/* 缩放滑块 */}
+        <div className="mb-4 flex w-[420px] flex-col gap-2">
+          <div className="flex items-center justify-between text-sm">
+            <span>缩放: {Math.round(zoomLevel * 100)}%</span>
+            <button 
+              className="text-xs text-blue-500 hover:underline"
+              onClick={() => setZoomLevel(1)}
+            >
+              重置
+            </button>
+          </div>
+          <Slider
+            defaultValue={[1]}
+            value={[zoomLevel]}
+            min={0.5}
+            max={2}
+            step={0.05}
+            onValueChange={handleZoomChange}
+          />
+        </div>
+        
+        {/* 图片区域 - Canvas */}
         <ImageCanvas
           ref={canvasRef}
           src={imgSrc}
@@ -428,6 +459,7 @@ export default function WorkbenchPage() {
           height={canvasHeight}
           ratio={selectedRatio}
           background={selectedBg}
+          zoom={zoomLevel}
         />
         
         {/* 底部操作按钮 */}
