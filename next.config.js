@@ -11,6 +11,16 @@ const nextConfig = {
           chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
         })
       );
+
+      // 更新 CSS 规则
+      const cssRule = config.module.rules.find(rule => rule.test?.test?.('.css'))
+      if (cssRule) {
+        cssRule.use = [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader'
+        ]
+      }
     }
     return config;
   },

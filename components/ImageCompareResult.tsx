@@ -1,15 +1,14 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Download, RefreshCw } from "lucide-react";
-import {
-  ReactCompareSlider,
-  ReactCompareSliderImage,
-} from "react-compare-slider";
+import CompareImage from "react-compare-image";
 
 interface ImageCompareResultProps {
   originalImage: string;
   processedImage: string;
   fileName?: string;
-  onReset: () => void;
+  onReset?: () => void;
 }
 
 export function ImageCompareResult({
@@ -22,7 +21,7 @@ export function ImageCompareResult({
     if (processedImage) {
       const link = document.createElement("a");
       link.href = processedImage;
-      link.download = `bg-removed-${fileName || "image"}.png`;
+      link.download = `inwind-bg-removed-${fileName || "image"}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -42,60 +41,53 @@ export function ImageCompareResult({
         </div>
       </div>
 
-      <div className="relative w-full p-4" style={{ aspectRatio: "16/9" }}>
-        <ReactCompareSlider
-          itemOne={
-            <ReactCompareSliderImage
-              src={originalImage}
-              alt="处理前图片"
-              style={{
-                objectFit: "contain",
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(248, 250, 252, 0.5)",
-              }}
-            />
-          }
-          itemTwo={
-            <ReactCompareSliderImage
-              src={processedImage}
-              alt="处理后图片"
-              style={{
-                objectFit: "contain",
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(248, 250, 252, 0.5)",
-              }}
-            />
-          }
-          className="rounded-md overflow-hidden shadow-sm"
-          style={{
-            height: "100%",
-            width: "100%",
-          }}
-          position={50}
-        />
-      </div>
-
-      <div className="bg-gray-50/50 backdrop-blur-sm p-4">
-        <div className="flex flex-col space-y-3 sm:flex-row sm:justify-between sm:space-x-4 sm:space-y-0">
-          <Button 
-            onClick={onReset} 
-            variant="outline"
-            className="border-gray-300/50 bg-white/50 text-gray-700 backdrop-blur-sm hover:bg-white/70"
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            重新上传
-          </Button>
-          <Button
-            onClick={handleDownload}
-            className="bg-gradient-to-r from-blue-600/90 to-violet-600/90 backdrop-blur-sm hover:from-blue-700/90 hover:to-violet-700/90"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            下载处理结果
-          </Button>
+      <div className="relative w-full p-4" style={{ aspectRatio: "4:3" }}>
+        <div className="relative w-full h-full [&_.right-image]:bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMCAwaDIwdjIwSDB6IiBmaWxsPSIjZjFmNWY5IiBmaWxsLW9wYWNpdHk9IjAuNSIvPjwvc3ZnPg==')] [&_.right-image]:bg-[length:20px_20px]">
+          <CompareImage
+            leftImage={originalImage}
+            rightImage={processedImage}
+            leftImageAlt="处理前图片"
+            rightImageAlt="处理后图片"
+            rightImageCss={{
+              backgroundImage: `
+                linear-gradient(45deg, rgba(241, 245, 249, 0.5) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(241, 245, 249, 0.5) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(241, 245, 249, 0.5) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(241, 245, 249, 0.5) 75%)
+              `,
+              backgroundSize: "20px 20px",
+              backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px"
+            }}
+            sliderLineWidth={2}
+            sliderLineColor="#ffffff"
+            handleSize={40}
+            hover={true}
+            aspectRatio="wider"
+          />
         </div>
       </div>
+
+      {onReset && (
+        <div className="bg-gray-50/50 backdrop-blur-sm p-4">
+          <div className="flex flex-col space-y-3 sm:flex-row sm:justify-between sm:space-x-4 sm:space-y-0">
+            <Button
+              onClick={onReset}
+              variant="outline"
+              className="border-gray-300/50 bg-white/50 text-gray-700 backdrop-blur-sm hover:bg-white/70"
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              重新上传
+            </Button>
+            <Button
+              onClick={handleDownload}
+              className="bg-gradient-to-r from-blue-600/90 to-violet-600/90 backdrop-blur-sm hover:from-blue-700/90 hover:to-violet-700/90"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              下载处理结果
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
