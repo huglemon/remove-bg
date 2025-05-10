@@ -27,7 +27,7 @@ const SmileFont = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "乘风智能抠图 | 一键移除图片背景",
+  title: "乘风智能修图 | 一键移除图片背景",
   description: "上传图片，立即获得背景移除效果，免费高效的AI抠图工具！",
   openGraph: {
     images: "https://rmbg.hellokaton.me/og.png",

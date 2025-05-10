@@ -19,7 +19,7 @@ const Logo = ({
         />
         {showText && (
           <div className={`${textClassName} flex items-baseline !leading-[1]`}>
-            乘风智能抠图
+            乘风智能修图
           </div>
         )}
       </div>

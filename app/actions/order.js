@@ -90,42 +90,44 @@ export async function getOrder(orderNo) {
 
 export async function getUserOrders({ uid }) {
   try {
-    console.log('getUserOrders 接收到的 uid:', uid)
-    
-    if (!uid) return { success: false, error: "用户ID不能为空" }
+    console.log("getUserOrders 接收到的 uid:", uid);
+
+    if (!uid) return { success: false, error: "用户ID不能为空" };
 
     // 验证用户会话
     const session = await auth.api.getSession({
       headers: await headers(),
-    })
+    });
 
-    console.log('当前会话:', session)
+    console.log("当前会话:", session);
 
     if (!session || !session.user) {
-      return { success: false, error: "用户未登录" }
+      return { success: false, error: "用户未登录" };
     }
 
-    const { user } = session
-    console.log('会话中的用户:', user)
-    
+    const { user } = session;
+    console.log("会话中的用户:", user);
+
     if (user.id !== uid) {
-      return { success: false, error: "用户状态异常" }
+      return { success: false, error: "用户状态异常" };
     }
 
-    const { db } = await connectToDatabase()
-    const orders = await db.collection("orders")
-      .find({ uid })
+    const { db } = await connectToDatabase();
+    const orders = await db
+      .collection("orders")
+      .find({ uid, status: { $ne: "expired" } })
+      .limit(5)
       .sort({ createdAt: -1 })
-      .toArray()
+      .toArray();
 
-    console.log('查询到的订单:', orders)
+    console.log("查询到的订单:", orders);
 
     return {
       success: true,
-      data: orders
-    }
+      data: orders,
+    };
   } catch (error) {
-    console.error('获取订单列表失败:', error)
-    return { success: false, error: error.message }
+    console.error("获取订单列表失败:", error);
+    return { success: false, error: error.message };
   }
 }

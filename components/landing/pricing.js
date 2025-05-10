@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
@@ -26,15 +21,20 @@ const pricingPlans = [
     period: "/月",
     features: ["批量抠图无限次", "有效期30天", "优先客服支持"],
     amount: 990,
-    subject: "乘风智能抠图30天VIP",
+    subject: "乘风智能修图30天VIP",
   },
   {
     title: "年度套餐",
     price: "¥66",
     period: "/年",
-    features: ["批量抠图无限次", "有效期365天", "优先客服支持", "专属客服通道"],
+    features: [
+      "批量抠图无限次",
+      "有效期365天",
+      "高级编辑无水印",
+      "专属客服通道",
+    ],
     amount: 6600,
-    subject: "乘风智能抠图365天VIP",
+    subject: "乘风智能修图365天VIP",
   },
 ];
 

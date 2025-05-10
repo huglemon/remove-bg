@@ -1,6 +1,21 @@
-"use client";
-import { ModeSwitch } from "@/components/mode-switch";
+import { Crown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { getCurrentSession } from "@/app/actions/user";
+import Link from "next/link";
 const NavbarBtn = () => {
-  return <ModeSwitch />;
+  const session = getCurrentSession();
+  return (
+    <Button size="sm">
+      {session ? (
+        <Link href="/dashboard" className="flex items-center gap-2 text-xs">
+          个人中心
+        </Link>
+      ) : (
+        <Link href="/auth/login" className="text-xs">
+          登录
+        </Link>
+      )}
+    </Button>
+  );
 };
 export default NavbarBtn;

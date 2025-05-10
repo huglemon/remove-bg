@@ -9,19 +9,19 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const { session } = await getCurrentSession();
-  console.log('Dashboard 页面获取到的会话:', session)
+  console.log("Dashboard 页面获取到的会话:", session);
 
   // 如果没有会话，重定向到登录页面
   if (!session) {
     redirect("/auth/login");
   }
   const { user, expiryDate } = session;
-  console.log('Dashboard 页面用户信息:', user)
+  console.log("Dashboard 页面用户信息:", user);
 
   const ordersData = await getUserOrders({ uid: user.id });
-  console.log('获取到的订单数据:', ordersData)
+  console.log("获取到的订单数据:", ordersData);
   const orders = ordersData.data;
-  
+
   return (
     <div className="mx-auto max-w-6xl p-4 md:p-8">
       <header className="mb-8">
@@ -92,12 +92,42 @@ export default async function DashboardPage() {
         <div className="rounded-lg bg-white p-6 shadow md:col-span-2">
           <h2 className="mb-4 text-lg font-bold">最近活动</h2>
           <div className="space-y-2">
-            {orders.map((order, index) => (
-              <p key={index} className="text-sm">
-                {new Date(order.createdAt).toLocaleString()} - {order.subject} -{" "}
-                {order.status}
+            {orders.length === 0 ? (
+              <p className="py-4 text-center text-sm text-gray-500">
+                暂无活动记录
               </p>
-            ))}
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {orders.map((order, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col justify-between rounded px-2 py-3 transition-colors hover:bg-gray-50 sm:flex-row sm:items-center"
+                  >
+                    <div className="flex flex-col gap-2">
+                      <span className="font-medium">{order.subject}</span>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <span
+                        className={`mt-1 w-fit rounded-full px-2 py-1 text-xs sm:mt-0 ${
+                          order.status === "completed"
+                            ? "bg-green-100 text-green-800"
+                            : order.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : order.status === "failed"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {order.status}
+                      </span>
+                      <span className="whitespace-nowrap text-xs text-gray-500">
+                        {new Date(order.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

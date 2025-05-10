@@ -123,7 +123,7 @@ export function ImageCompareResult({
               disabled={isPreparingWorkbench}
             >
               <LoaderPinwheel className={`mr-2 h-4 w-4 ${isPreparingWorkbench ? "animate-spin" : ""}`} />
-              <Link href={workbenchUrl}>高级处理</Link>
+              <Link href={workbenchUrl}>高级编辑</Link>
             </Button>
             <Button
               onClick={handleDownload}
