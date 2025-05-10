@@ -39,9 +39,14 @@ export async function registerUser(formData) {
   const email = formData.get("email")?.trim();
   const password = formData.get("password");
   const name = formData.get("name")?.trim();
+  const captchaToken = formData.get("captchaToken");
 
   if (!email || !password) {
     return { success: false, error: "邮箱和密码不能为空" };
+  }
+
+  if (!captchaToken) {
+    return { success: false, error: "请完成验证码验证" };
   }
 
   try {
@@ -50,6 +55,9 @@ export async function registerUser(formData) {
         email,
         password,
         userData: { name },
+      },
+      headers: {
+        "x-captcha-response": captchaToken,
       },
     });
     return { success: true, data: result };
@@ -67,9 +75,14 @@ export async function loginUser(formData) {
   // 验证输入
   const email = formData.get("email")?.trim();
   const password = formData.get("password");
+  const captchaToken = formData.get("captchaToken");
 
   if (!email || !password) {
     return { success: false, error: "邮箱和密码不能为空" };
+  }
+
+  if (!captchaToken) {
+    return { success: false, error: "请完成验证码验证" };
   }
 
   try {
@@ -77,6 +90,9 @@ export async function loginUser(formData) {
       body: {
         email,
         password,
+      },
+      headers: {
+        "x-captcha-response": captchaToken,
       },
     });
     return { success: true, data: result };
@@ -121,32 +137,32 @@ export async function extendMemberExpiryDate(uid, days = 30) {
   if (!uid) {
     return { success: false, error: "用户ID不能为空" };
   }
-  
+
   if (!days || days <= 0) {
     return { success: false, error: "延长天数必须大于0" };
   }
 
   try {
     const { db } = await connectToDatabase();
-    
+
     // 构建查询条件
     let query = {};
     const objectId = safeObjectId(uid);
-    
+
     if (objectId) {
       query = { _id: objectId };
     } else {
       // 如果不是有效的ObjectId，使用uid作为字符串查询
       query = { uid };
     }
-    
+
     // 查询用户
     const user = await db.collection("user").findOne(query);
-    
+
     if (!user) {
       return { success: false, error: "用户不存在" };
     }
-    
+
     // 计算新的过期日期
     let newExpiryDate;
     if (user.expiryDate) {
@@ -155,22 +171,23 @@ export async function extendMemberExpiryDate(uid, days = 30) {
       newExpiryDate.setDate(newExpiryDate.getDate() + days);
     } else {
       // 如果没有过期日期，则从当前时间开始计算
-      newExpiryDate = new Date(new Date().getTime() + days * 24 * 60 * 60 * 1000);
+      newExpiryDate = new Date(
+        new Date().getTime() + days * 24 * 60 * 60 * 1000,
+      );
     }
-    
+
     // 更新用户数据
-    const updateResult = await db.collection("user").updateOne(
-      query, 
-      { $set: { expiryDate: newExpiryDate } }
-    );
-    
+    const updateResult = await db
+      .collection("user")
+      .updateOne(query, { $set: { expiryDate: newExpiryDate } });
+
     if (updateResult.matchedCount === 0) {
       return { success: false, error: "用户更新失败" };
     }
-    
-    return { 
+
+    return {
       success: true,
-      data: { expiryDate: newExpiryDate }
+      data: { expiryDate: newExpiryDate },
     };
   } catch (error) {
     console.error("延长会员有效期失败:", error);
@@ -188,21 +205,21 @@ export async function getMemberExpiryDate(uid) {
 
   try {
     const { db } = await connectToDatabase();
-    
+
     // 构建查询条件
     let query = {};
     const objectId = safeObjectId(uid);
-    
+
     if (objectId) {
       query = { _id: objectId };
     } else {
       // 如果不是有效的ObjectId，使用uid作为字符串查询
       query = { uid };
     }
-    
+
     // 查询用户
     const user = await db.collection("user").findOne(query);
-    
+
     // 安全访问expiryDate
     return user?.expiryDate || null;
   } catch (error) {

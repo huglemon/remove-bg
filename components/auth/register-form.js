@@ -1,13 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { registerUser } from '@/app/actions/user';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 export function RegisterForm() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState('');
+	const [captchaToken, setCaptchaToken] = useState('');
+	const captchaRef = useRef(null);
 	const router = useRouter();
 
 	async function handleSubmit(event) {
@@ -15,7 +18,14 @@ export function RegisterForm() {
 		setIsLoading(true);
 		setError('');
 
+		if (!captchaToken) {
+			setError('请完成验证码验证');
+			setIsLoading(false);
+			return;
+		}
+
 		const formData = new FormData(event.target);
+		formData.append('captchaToken', captchaToken);
 		const result = await registerUser(formData);
 
 		setIsLoading(false);
@@ -24,8 +34,14 @@ export function RegisterForm() {
 			router.push('/dashboard');
 		} else {
 			setError(result.error);
+			captchaRef.current?.resetCaptcha();
+			setCaptchaToken('');
 		}
 	}
+
+	const onCaptchaChange = (token) => {
+		setCaptchaToken(token);
+	};
 
 	return (
 		<form
@@ -79,6 +95,14 @@ export function RegisterForm() {
 					type='password'
 					required
 					className='mt-1 block w-full rounded-md border p-2'
+				/>
+			</div>
+
+			<div className="flex justify-center">
+				<HCaptcha
+					ref={captchaRef}
+					sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY}
+					onChange={onCaptchaChange}
 				/>
 			</div>
 
