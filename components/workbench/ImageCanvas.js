@@ -220,6 +220,10 @@ const ImageCanvas = forwardRef(function ImageCanvas(
       for (let y = 0; y < h; y += stripeHeight * 2) {
         ctx.fillRect(0, y, w, stripeHeight);
       }
+    } else if (background && background.startsWith("#")) {
+      // 处理自定义HEX颜色
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, w, h);
     }
 
     // 在背景上方、图像下方绘制水印

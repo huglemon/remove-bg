@@ -142,7 +142,28 @@ const backgroundColors = [
   },
 ];
 
+import ColorPickerButton from "./ColorPickerButton";
+import { useState, useEffect } from "react";
+
 function BackgroundSelector({ selectedBg, onSelectBg, disabled = false }) {
+  const [customColor, setCustomColor] = useState("");
+  
+  // 判断当前选中的背景是否是自定义HEX颜色
+  const isCustomColor = selectedBg && selectedBg.startsWith("#");
+  
+  // 当选中的背景变化时，如果是自定义HEX颜色，更新customColor
+  useEffect(() => {
+    if (isCustomColor) {
+      setCustomColor(selectedBg);
+    }
+  }, [selectedBg, isCustomColor]);
+
+  // 处理自定义颜色变化
+  const handleCustomColorChange = (color) => {
+    setCustomColor(color);
+    onSelectBg(color);
+  };
+
   return (
     <div className="mb-6">
       <div className="mb-2 text-sm font-medium">背景颜色</div>
@@ -157,6 +178,14 @@ function BackgroundSelector({ selectedBg, onSelectBg, disabled = false }) {
             {item.label}
           </div>
         ))}
+        
+        {/* 自定义颜色选择器 */}
+        <div className={`${isCustomColor ? "ring-2 ring-blue-500 ring-offset-2" : ""}`}>
+          <ColorPickerButton 
+            currentColor={customColor} 
+            onColorChange={handleCustomColorChange}
+          />
+        </div>
       </div>
     </div>
   );
@@ -164,6 +193,11 @@ function BackgroundSelector({ selectedBg, onSelectBg, disabled = false }) {
 
 // 获取背景名称（用于文件名）
 export function getBackgroundName(selectedBg) {
+  // 处理自定义颜色
+  if (selectedBg && selectedBg.startsWith("#")) {
+    return `自定义色${selectedBg}`;
+  }
+  
   switch (selectedBg) {
     case "transparent":
       return "透明";
