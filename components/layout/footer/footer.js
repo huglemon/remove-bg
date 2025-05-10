@@ -16,7 +16,7 @@ const Footer = () => {
             </Link>
           </p>
         </div>
-        <div className="flex justify-between">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <FooterLinks
             title="关于我们"
             links={SiteConfig.aboutLinks.slice(0, 5)}

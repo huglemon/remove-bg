@@ -14,7 +14,9 @@ const Navbar = ({
           fullWidth ? "w-full" : "container"
         }`}
       >
-        <Logo />
+        <div className="flex w-6/12 sm:w-2/12">
+          <Logo />
+        </div>
         <div className="flex w-6/12 justify-center">
           {showLinks && <NavLinks />}
         </div>

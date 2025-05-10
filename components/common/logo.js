@@ -9,7 +9,7 @@ const Logo = ({
 }) => {
   return (
     <Link title="logo" href={href}>
-      <div className="inline-flex min-w-[200px] items-center justify-start gap-1 md:gap-2">
+      <div className="inline-flex items-center justify-start gap-1 md:gap-2">
         <Image
           src="/logo.svg"
           alt="logo"
