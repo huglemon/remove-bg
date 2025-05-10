@@ -43,7 +43,7 @@ export default async function Pricing() {
   const uid = session?.user?.id;
 
   return (
-    <section className="w-full bg-gray-50/50 py-20">
+    <section id="price" className="w-full bg-gray-50/50 py-20">
       <div className="container mx-auto px-4">
         <div className="mb-12 text-center">
           <h2 className="mb-4 font-smiley text-4xl font-bold text-gray-900">

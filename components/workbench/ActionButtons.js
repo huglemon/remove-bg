@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 // 操作按钮配置
 const actionButtons = [
   {
@@ -56,10 +57,12 @@ function ActionButtons({ onActionClick, disabled = false }) {
           onClick={() => onActionClick(btn)}
           disabled={disabled}
         >
-          <img
+          <Image
             src={btn.icon || "/logo/id.svg"}
             alt={btn.label}
-            className="mb-2 h-8 w-8 text-gray-400"
+            width={32}
+            height={32}
+            className="mb-2 text-gray-400"
           />
           {btn.label}
         </button>

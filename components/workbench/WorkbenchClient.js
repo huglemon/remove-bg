@@ -5,11 +5,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-import ImageCanvas, { drawWatermark } from "./ImageCanvas";
+import ImageCanvas from "./ImageCanvas";
 import BackgroundSelector, { getBackgroundName } from "./BackgroundSelector";
 import ActionButtons from "./ActionButtons";
 import ZoomControl from "./ZoomControl";
 import { Crown } from "lucide-react";
+
 function WorkbenchClient({ imgSrc: initialImgSrc, imgKey, isExpired = true }) {
   const [selectedBg, setSelectedBg] = useState("transparent");
   const [selectedRatio, setSelectedRatio] = useState(null);
