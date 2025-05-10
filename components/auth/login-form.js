@@ -13,10 +13,15 @@ export function LoginForm() {
   const captchaRef = useRef(null);
   const router = useRouter();
 
+  // 检查环境变量
+  console.log('HCaptcha Site Key:', process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY);
+
   async function handleSubmit(event) {
     event.preventDefault();
     setIsLoading(true);
     setError("");
+
+    console.log('当前验证码token:', captchaToken);
 
     if (!captchaToken) {
       setError("请完成验证码验证");
@@ -26,7 +31,15 @@ export function LoginForm() {
 
     const formData = new FormData(event.target);
     formData.append("captchaToken", captchaToken);
+    
+    console.log('提交的表单数据:', {
+      email: formData.get('email'),
+      password: formData.get('password'),
+      captchaToken: formData.get('captchaToken')
+    });
+
     const result = await loginUser(formData);
+    console.log('登录结果:', result);
 
     setIsLoading(false);
 
@@ -40,19 +53,23 @@ export function LoginForm() {
   }
 
   const onCaptchaChange = (token) => {
-    setCaptchaToken(token);
-    setError("");
+    console.log('验证码token:', token);
+    if (token) {
+      setCaptchaToken(token);
+      setError("");
+    }
   };
 
   const onCaptchaExpire = () => {
+    console.log('验证码已过期');
     setCaptchaToken("");
     setError("验证码已过期，请重新验证");
   };
 
   const onCaptchaError = (error) => {
+    console.log('验证码错误:', error);
     setCaptchaToken("");
     setError("验证码加载失败，请刷新页面重试");
-    console.error("验证码错误:", error);
   };
 
   return (
@@ -99,9 +116,19 @@ export function LoginForm() {
           onChange={onCaptchaChange}
           onExpire={onCaptchaExpire}
           onError={onCaptchaError}
+          onLoad={() => console.log('验证码组件加载完成')}
           theme="light"
           size="normal"
           tabindex={0}
+          languageOverride="zh"
+          reCaptchaCompat={false}
+          onVerify={(token) => {
+            console.log('验证完成，token:', token);
+            if (token) {
+              setCaptchaToken(token);
+              setError("");
+            }
+          }}
         />
       </div>
 
