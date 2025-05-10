@@ -2,6 +2,10 @@ import { RegisterForm } from '@/components/auth/register-form';
 import { getCurrentSession } from '@/app/actions/user';
 import { redirect } from 'next/navigation';
 
+
+export const dynamic = "force-dynamic";
+
+
 export default async function RegisterPage() {
 	// 检查用户是否已登录
 	const { session } = await getCurrentSession();
