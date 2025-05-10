@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { queryOrderStatus, createPaymentForm } from "@/lib/payment-service";
+import { createOrder } from "@/app/actions/order";
 
 export function PaymentButton({ uid, subject = "测试商品", amount = 990 }) {
   // 验证输入参数是否有效
@@ -48,17 +49,12 @@ export function PaymentButton({ uid, subject = "测试商品", amount = 990 }) {
         payType: "wxpay", // 微信支付
       };
 
-      fetch("/api/payment/create", {
-        method: "POST",
-        body: JSON.stringify({
-          uid,
-          amount,
-          subject,
-          orderNo: mchtOrderNo,
-          payType: "wxpay",
-        }),
-      }).then((res) => {
-        console.log(res);
+      createOrder({
+        uid,
+        amount,
+        subject,
+        orderNo: mchtOrderNo,
+        payType: "wxpay",
       });
 
       // 获取表单提交数据

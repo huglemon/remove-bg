@@ -167,8 +167,14 @@ export async function extendMemberExpiryDate(uid, days = 30) {
     let newExpiryDate;
     if (user.expiryDate) {
       // 如果已有过期日期，则在此基础上延长
-      newExpiryDate = new Date(user.expiryDate);
-      newExpiryDate.setDate(newExpiryDate.getDate() + days);
+      if (user.expiryDate > new Date()) {
+        newExpiryDate = new Date(user.expiryDate);
+        newExpiryDate.setDate(newExpiryDate.getDate() + days);
+      } else {
+        newExpiryDate = new Date(
+          new Date().getTime() + days * 24 * 60 * 60 * 1000,
+        );
+      }
     } else {
       // 如果没有过期日期，则从当前时间开始计算
       newExpiryDate = new Date(
