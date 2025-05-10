@@ -19,7 +19,10 @@ export function ModeSwitch() {
   return (
     <div className="flex items-center gap-2">
       <div className="flex items-center gap-1">
-        <Label htmlFor="mode-switch" className="text-sm text-gray-600">
+        <Label
+          htmlFor="mode-switch"
+          className="hidden text-sm text-gray-600 sm:block"
+        >
           单图
         </Label>
       </div>
@@ -30,7 +33,10 @@ export function ModeSwitch() {
         className="data-[state=checked]:bg-blue-600"
       />
       <div className="flex items-center gap-1">
-        <Label htmlFor="mode-switch" className="text-sm text-gray-600">
+        <Label
+          htmlFor="mode-switch"
+          className="hidden text-sm text-gray-600 sm:block"
+        >
           批量
         </Label>
         <Crown className="h-4 w-4 fill-amber-200 text-amber-500" />
