@@ -87,6 +87,19 @@ export default function PricingDialog({ uid, children }) {
             />
           </div>
         </div>
+        <div className="mt-4 border-t pt-4">
+          <p className="text-center text-sm text-gray-500">
+            点击购买即表示您已阅读并同意
+            <a
+              href="/agreement/user"
+              target="_blank"
+              className="ml-1 text-amber-600 hover:text-amber-800"
+            >
+              《用户协议》
+            </a>
+            。付费功能与免费功能使用相同的处理引擎，建议先使用免费功能测试效果。
+          </p>
+        </div>
       </DialogContent>
     </Dialog>
   );
