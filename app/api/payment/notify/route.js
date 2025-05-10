@@ -73,7 +73,7 @@ export async function GET(request) {
         await extendMemberExpiryDate(order.uid, 365);
       }
 
-      await updateOrderStatus(order.out_trade_no, "paid");
+      await updateOrderStatus({ orderNo: params.out_trade_no, status: "paid" });
 
       // 保存支付信息到日志
       console.log("支付成功:", {
