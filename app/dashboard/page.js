@@ -1,21 +1,27 @@
 import { getCurrentSession } from "@/app/actions/user";
+import { getUserOrders } from "@/app/actions/order";
 import { LogoutButton } from "@/components/auth/logout-button";
-import { PaymentButton } from "@/components/payment/payment-button";
 import { redirect } from "next/navigation";
 import { Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import PricingDialog from "@/components/payment/pricing-dialog";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const { session } = await getCurrentSession();
+  console.log('Dashboard 页面获取到的会话:', session)
 
   // 如果没有会话，重定向到登录页面
   if (!session) {
     redirect("/auth/login");
   }
   const { user, expiryDate } = session;
+  console.log('Dashboard 页面用户信息:', user)
 
+  const ordersData = await getUserOrders({ uid: user.id });
+  console.log('获取到的订单数据:', ordersData)
+  const orders = ordersData.data;
+  
   return (
     <div className="mx-auto max-w-6xl p-4 md:p-8">
       <header className="mb-8">
@@ -56,9 +62,7 @@ export default async function DashboardPage() {
                   {expiryDate > Date.now() ? "付费用户" : "免费用户"}
                 </span>
               </div>
-              {expiryDate > Date.now() ? (
-                <PaymentButton uid={user.id} />
-              ) : (
+              <PricingDialog uid={user.id}>
                 <Button
                   size="sm"
                   className="cursor-pointer bg-amber-500 text-white hover:bg-amber-600"
@@ -66,11 +70,7 @@ export default async function DashboardPage() {
                   <Crown className="mr-1 h-4 w-4" />
                   <span>升级</span>
                 </Button>
-              )}
-              {/* <Button size="sm" className="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white">
-                <Crown className="mr-1 h-4 w-4" />
-                <span>升级</span>
-              </Button> */}
+              </PricingDialog>
             </div>
             {expiryDate > Date.now() && (
               <p className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -92,7 +92,12 @@ export default async function DashboardPage() {
         <div className="rounded-lg bg-white p-6 shadow md:col-span-2">
           <h2 className="mb-4 text-lg font-bold">最近活动</h2>
           <div className="space-y-2">
-            <p className="text-sm">暂无最近活动记录</p>
+            {orders.map((order, index) => (
+              <p key={index} className="text-sm">
+                {new Date(order.createdAt).toLocaleString()} - {order.subject} -{" "}
+                {order.status}
+              </p>
+            ))}
           </div>
         </div>
       </div>

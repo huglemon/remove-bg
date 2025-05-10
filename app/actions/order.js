@@ -20,7 +20,8 @@ async function connectToDatabase() {
   }
 }
 
-export async function createOrder(uid, amount, subject, orderNo, payType) {
+export async function createOrder({ uid, amount, subject, orderNo, payType }) {
+  console.log(uid, amount, subject, orderNo, payType);
   try {
     // 验证必要参数
     if (!uid) return { success: false, error: "用户ID不能为空" };
@@ -85,4 +86,46 @@ export async function getOrder(orderNo) {
   const { db } = await connectToDatabase();
   const order = await db.collection("orders").findOne({ orderNo });
   return order;
+}
+
+export async function getUserOrders({ uid }) {
+  try {
+    console.log('getUserOrders 接收到的 uid:', uid)
+    
+    if (!uid) return { success: false, error: "用户ID不能为空" }
+
+    // 验证用户会话
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
+
+    console.log('当前会话:', session)
+
+    if (!session || !session.user) {
+      return { success: false, error: "用户未登录" }
+    }
+
+    const { user } = session
+    console.log('会话中的用户:', user)
+    
+    if (user.id !== uid) {
+      return { success: false, error: "用户状态异常" }
+    }
+
+    const { db } = await connectToDatabase()
+    const orders = await db.collection("orders")
+      .find({ uid })
+      .sort({ createdAt: -1 })
+      .toArray()
+
+    console.log('查询到的订单:', orders)
+
+    return {
+      success: true,
+      data: orders
+    }
+  } catch (error) {
+    console.error('获取订单列表失败:', error)
+    return { success: false, error: error.message }
+  }
 }
