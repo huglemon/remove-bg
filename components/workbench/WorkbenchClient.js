@@ -270,6 +270,10 @@ function WorkbenchClient({ imgSrc: initialImgSrc, imgKey, isExpired = true }) {
           for (let y = 0; y < outputHeight; y += stripeHeight * 2) {
             ctx.fillRect(0, y, outputWidth, stripeHeight);
           }
+        } else if (selectedBg && selectedBg.startsWith("#")) {
+          // 处理自定义HEX颜色
+          ctx.fillStyle = selectedBg;
+          ctx.fillRect(0, 0, outputWidth, outputHeight);
         }
 
         // 绘制原图，应用当前的缩放
