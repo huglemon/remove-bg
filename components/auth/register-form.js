@@ -18,6 +18,8 @@ export function RegisterForm() {
 		setIsLoading(true);
 		setError('');
 
+		console.log('当前验证码token:', captchaToken);
+
 		if (!captchaToken) {
 			setError('请完成验证码验证');
 			setIsLoading(false);
@@ -26,7 +28,16 @@ export function RegisterForm() {
 
 		const formData = new FormData(event.target);
 		formData.append('captchaToken', captchaToken);
+		
+		console.log('提交的表单数据:', {
+			name: formData.get('name'),
+			email: formData.get('email'),
+			password: formData.get('password'),
+			captchaToken: formData.get('captchaToken')
+		});
+
 		const result = await registerUser(formData);
+		console.log('注册结果:', result);
 
 		setIsLoading(false);
 
@@ -40,7 +51,23 @@ export function RegisterForm() {
 	}
 
 	const onCaptchaChange = (token) => {
-		setCaptchaToken(token);
+		console.log('验证码token:', token);
+		if (token) {
+			setCaptchaToken(token);
+			setError('');
+		}
+	};
+
+	const onCaptchaExpire = () => {
+		console.log('验证码已过期');
+		setCaptchaToken('');
+		setError('验证码已过期，请重新验证');
+	};
+
+	const onCaptchaError = (error) => {
+		console.log('验证码错误:', error);
+		setCaptchaToken('');
+		setError('验证码加载失败，请刷新页面重试');
 	};
 
 	return (
@@ -103,6 +130,21 @@ export function RegisterForm() {
 					ref={captchaRef}
 					sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY}
 					onChange={onCaptchaChange}
+					onExpire={onCaptchaExpire}
+					onError={onCaptchaError}
+					onLoad={() => console.log('验证码组件加载完成')}
+					theme="light"
+					size="normal"
+					tabindex={0}
+					languageOverride="zh"
+					reCaptchaCompat={false}
+					onVerify={(token) => {
+						console.log('验证完成，token:', token);
+						if (token) {
+							setCaptchaToken(token);
+							setError('');
+						}
+					}}
 				/>
 			</div>
 
