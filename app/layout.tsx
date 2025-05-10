@@ -29,8 +29,10 @@ const SmileFont = localFont({
 export const metadata: Metadata = {
   title: "乘风智能修图 | 一键移除图片背景",
   description: "上传图片，立即获得背景移除效果，免费高效的AI抠图工具！",
+  keywords:
+    "免费工具, 免费抠图, 外贸抠图, AI修图, 智能修图, 一键抠图, 背景移除,批量抠图,白底图,电商图, 图片处理, 在线工具",
   openGraph: {
-    // images: "https://rmbg.hellokaton.me/og.png",
+    images: "/og.png",
   },
   // 添加favicon
   icons: {
