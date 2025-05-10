@@ -30,7 +30,7 @@ export function ModeSwitch() {
         id="mode-switch"
         checked={isBatchMode}
         onCheckedChange={handleModeChange}
-        className="data-[state=checked]:bg-blue-600"
+        className="data-[state=checked]:bg-amber-500"
       />
       <div className="flex items-center gap-1">
         <Label
