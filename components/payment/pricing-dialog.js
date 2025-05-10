@@ -50,7 +50,7 @@ export default function PricingDialog({ uid, children }) {
                 </li>
               </ul>
             </div>
-            <PaymentButton uid={uid} amount={990} subject="乘风智能抠图30天VIP" />
+            <PaymentButton uid={uid} amount={990} subject="乘风智能修图30天VIP" />
           </div>
 
           {/* 年度套餐 */}
@@ -83,7 +83,7 @@ export default function PricingDialog({ uid, children }) {
             <PaymentButton
               uid={uid}
               amount={6600}
-              subject="乘风智能抠图365天VIP"
+              subject="乘风智能修图365天VIP"
             />
           </div>
         </div>
