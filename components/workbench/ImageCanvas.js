@@ -78,7 +78,7 @@ const ImageCanvas = forwardRef(function ImageCanvas(
         ref.current = internalCanvasRef.current;
       }
     }
-  }, [ref, internalCanvasRef.current]);
+  }, [ref]);
 
   // 监听外部传入的偏移量变化
   useEffect(() => {
@@ -353,27 +353,18 @@ const ImageCanvas = forwardRef(function ImageCanvas(
       }
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, startDragX, startDragY, onOffsetChange]);
+  }, [isDragging, startDragX, startDragY, onOffsetChange, handleMouseDown, handleMouseMove, handleMouseUp]);
 
   // 在各种参数变化时重绘
   useEffect(() => {
     drawCanvas();
-  }, [src, width, height, ratio, background, zoom, offsetX, offsetY]);
+  }, [src, width, height, ratio, background, zoom, offsetX, offsetY, drawCanvas]);
 
   // 当比例或尺寸变化时重置偏移量
   useEffect(() => {
     setOffsetX(0);
     setOffsetY(0);
   }, [ratio, width, height]);
-
-  // 添加一个函数用于处理图像偏移更新
-  const handleImageOffsetChange = (offsetX, offsetY) => {
-    setOffsetX(offsetX);
-    setOffsetY(offsetY);
-    if (onOffsetChange) {
-      onOffsetChange(offsetX, offsetY);
-    }
-  };
 
   return (
     <canvas

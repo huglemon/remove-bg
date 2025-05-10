@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 // 背景颜色选项
 const backgroundColors = [
   // 透明/马赛克
