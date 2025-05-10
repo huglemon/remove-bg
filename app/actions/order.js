@@ -77,7 +77,7 @@ export async function createOrder({ uid, amount, subject, orderNo, payType }) {
   }
 }
 
-export async function updateOrderStatus(orderNo, status) {
+export async function updateOrderStatus({ orderNo, status }) {
   const { db } = await connectToDatabase();
   await db.collection("orders").updateOne({ orderNo }, { $set: { status } });
 }
