@@ -37,20 +37,24 @@ export default function PricingDialog({ uid, children }) {
               </div>
               <ul className="mt-6 space-y-4">
                 <li className="flex items-center">
-                  <Check className="mr-2 h-5 w-5 text-green-500" />
+                  <Check className="mr-2 h-5 w-5 text-amber-500" />
                   <span>批量抠图无限次</span>
                 </li>
                 <li className="flex items-center">
-                  <Check className="mr-2 h-5 w-5 text-green-500" />
+                  <Check className="mr-2 h-5 w-5 text-amber-500" />
                   <span>有效期30天</span>
                 </li>
                 <li className="flex items-center">
-                  <Check className="mr-2 h-5 w-5 text-green-500" />
+                  <Check className="mr-2 h-5 w-5 text-amber-500" />
                   <span>优先客服支持</span>
                 </li>
               </ul>
             </div>
-            <PaymentButton uid={uid} amount={990} subject="乘风智能修图30天VIP" />
+            <PaymentButton
+              uid={uid}
+              amount={990}
+              subject="乘风智能修图30天VIP"
+            />
           </div>
 
           {/* 年度套餐 */}
@@ -63,19 +67,19 @@ export default function PricingDialog({ uid, children }) {
               </div>
               <ul className="mb-4 mt-6 space-y-4">
                 <li className="flex items-center">
-                  <Check className="mr-2 h-5 w-5 text-green-500" />
+                  <Check className="mr-2 h-5 w-5 text-amber-500" />
                   <span>批量抠图无限次</span>
                 </li>
                 <li className="flex items-center">
-                  <Check className="mr-2 h-5 w-5 text-green-500" />
+                  <Check className="mr-2 h-5 w-5 text-amber-500" />
+                  <span>高级编辑无水印</span>
+                </li>
+                <li className="flex items-center">
+                  <Check className="mr-2 h-5 w-5 text-amber-500" />
                   <span>有效期365天</span>
                 </li>
                 <li className="flex items-center">
-                  <Check className="mr-2 h-5 w-5 text-green-500" />
-                  <span>优先客服支持</span>
-                </li>
-                <li className="flex items-center">
-                  <Check className="mr-2 h-5 w-5 text-green-500" />
+                  <Check className="mr-2 h-5 w-5 text-amber-500" />
                   <span>专属客服通道</span>
                 </li>
               </ul>

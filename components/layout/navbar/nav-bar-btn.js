@@ -1,4 +1,3 @@
-import { Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCurrentSession } from "@/app/actions/user";
 import Link from "next/link";
