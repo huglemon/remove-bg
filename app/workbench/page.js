@@ -202,10 +202,19 @@ const ImageCanvas = forwardRef(function ImageCanvas(
     ratio = null,
     background = "transparent",
     zoom = 1,
+    onOffsetChange,
+    offsetX: externalOffsetX,
+    offsetY: externalOffsetY,
   },
   ref,
 ) {
   const internalCanvasRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [offsetX, setOffsetX] = useState(externalOffsetX || 0);
+  const [offsetY, setOffsetY] = useState(externalOffsetY || 0);
+  const [startDragX, setStartDragX] = useState(0);
+  const [startDragY, setStartDragY] = useState(0);
+  const imageInfoRef = useRef({ width: 0, height: 0, x: 0, y: 0 });
 
   // 将内部ref暴露给父组件
   useEffect(() => {
@@ -217,6 +226,15 @@ const ImageCanvas = forwardRef(function ImageCanvas(
       }
     }
   }, [ref, internalCanvasRef.current]);
+
+  // 监听外部传入的偏移量变化
+  useEffect(() => {
+    if (externalOffsetX !== undefined) setOffsetX(externalOffsetX);
+  }, [externalOffsetX]);
+
+  useEffect(() => {
+    if (externalOffsetY !== undefined) setOffsetY(externalOffsetY);
+  }, [externalOffsetY]);
 
   // 重绘画布
   const drawCanvas = () => {
@@ -365,18 +383,137 @@ const ImageCanvas = forwardRef(function ImageCanvas(
       const drawWidth = img.width * finalScale;
       const drawHeight = img.height * finalScale;
 
-      // 居中定位
-      const x = (w - drawWidth) / 2;
-      const y = (h - drawHeight) / 2;
+      // 带偏移量的定位
+      const x = (w - drawWidth) / 2 + offsetX;
+      const y = (h - drawHeight) / 2 + offsetY;
+
+      // 存储图像信息供拖动使用
+      imageInfoRef.current = {
+        width: drawWidth,
+        height: drawHeight,
+        x: x,
+        y: y
+      };
 
       ctx.drawImage(img, x, y, drawWidth, drawHeight);
     };
     img.src = src;
   };
 
+  // 处理鼠标事件
+  const handleMouseDown = (e) => {
+    const canvas = internalCanvasRef.current;
+    if (!canvas) return;
+
+    // 获取鼠标相对于canvas的位置
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // 检查点击是否在图像内
+    const imgInfo = imageInfoRef.current;
+    if (
+      mouseX >= imgInfo.x &&
+      mouseX <= imgInfo.x + imgInfo.width &&
+      mouseY >= imgInfo.y &&
+      mouseY <= imgInfo.y + imgInfo.height
+    ) {
+      setIsDragging(true);
+      setStartDragX(mouseX - imgInfo.x);
+      setStartDragY(mouseY - imgInfo.y);
+      // 设置cursor为grabbing
+      canvas.style.cursor = "grabbing";
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    // 鼠标悬停在图像上时改变鼠标样式
+    const canvas = internalCanvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // 检查鼠标是否在图像上
+    const imgInfo = imageInfoRef.current;
+    if (
+      mouseX >= imgInfo.x &&
+      mouseX <= imgInfo.x + imgInfo.width &&
+      mouseY >= imgInfo.y &&
+      mouseY <= imgInfo.y + imgInfo.height
+    ) {
+      if (!isDragging) canvas.style.cursor = "grab";
+    } else {
+      if (!isDragging) canvas.style.cursor = "default";
+    }
+
+    // 如果正在拖动，更新图像位置
+    if (isDragging) {
+      // 计算新位置
+      const newX = mouseX - startDragX;
+      const newY = mouseY - startDragY;
+      
+      // 计算位置偏移量
+      const newOffsetX = newX - ((canvas.width - imgInfo.width) / 2);
+      const newOffsetY = newY - ((canvas.height - imgInfo.height) / 2);
+      
+      setOffsetX(newOffsetX);
+      setOffsetY(newOffsetY);
+      
+      // 通知父组件偏移量变化
+      if (onOffsetChange) {
+        onOffsetChange(newOffsetX, newOffsetY);
+      }
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      if (internalCanvasRef.current) {
+        internalCanvasRef.current.style.cursor = "default";
+      }
+    }
+  };
+
+  // 在组件卸载时移除鼠标事件监听器
+  useEffect(() => {
+    const canvas = internalCanvasRef.current;
+    if (canvas) {
+      canvas.addEventListener("mousedown", handleMouseDown);
+      canvas.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      if (canvas) {
+        canvas.removeEventListener("mousedown", handleMouseDown);
+        canvas.removeEventListener("mousemove", handleMouseMove);
+      }
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, startDragX, startDragY, onOffsetChange]);
+
+  // 在各种参数变化时重绘
   useEffect(() => {
     drawCanvas();
-  }, [src, width, height, ratio, background, zoom]);
+  }, [src, width, height, ratio, background, zoom, offsetX, offsetY]);
+
+  // 当比例或尺寸变化时重置偏移量
+  useEffect(() => {
+    setOffsetX(0);
+    setOffsetY(0);
+  }, [ratio, width, height]);
+
+  // 添加一个函数用于处理图像偏移更新
+  const handleImageOffsetChange = (offsetX, offsetY) => {
+    setOffsetX(offsetX);
+    setOffsetY(offsetY);
+    if (onOffsetChange) {
+      onOffsetChange(offsetX, offsetY);
+    }
+  };
 
   return (
     <canvas
@@ -396,6 +533,7 @@ export default function WorkbenchPage() {
   const searchParams = useSearchParams();
   const [imageLoadError, setImageLoadError] = useState(false);
   const [imgSrc, setImgSrc] = useState(""); // 图片源现在是动态设置的
+  const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 }); // 存储图像偏移量
 
   // 保存原始尺寸，防止重复调整导致画布不断缩小
   const [originalWidth] = useState(420);
@@ -683,9 +821,13 @@ export default function WorkbenchPage() {
         const drawWidth = originalWidth * finalScale;
         const drawHeight = originalHeight * finalScale;
 
-        // 居中定位
-        const x = (outputWidth - drawWidth) / 2;
-        const y = (outputHeight - drawHeight) / 2;
+        // 计算偏移量比例用于导出图像
+        const offsetRatioX = imageOffset.x / canvasRef.current.width;
+        const offsetRatioY = imageOffset.y / canvasRef.current.height;
+
+        // 居中定位并添加偏移量
+        const x = (outputWidth - drawWidth) / 2 + (offsetRatioX * outputWidth);
+        const y = (outputHeight - drawHeight) / 2 + (offsetRatioY * outputHeight);
 
         // 绘制图像，使用原始图片
         ctx.drawImage(originalImg, x, y, drawWidth, drawHeight);
@@ -729,6 +871,9 @@ export default function WorkbenchPage() {
   const handleRatioClick = (button) => {
     // 更新选中比例
     setSelectedRatio(button.ratio);
+    
+    // 重置图像偏移量
+    setImageOffset({ x: 0, y: 0 });
 
     if (button.ratio) {
       // 总是从原始尺寸开始计算，确保不会逐渐缩小
@@ -753,6 +898,16 @@ export default function WorkbenchPage() {
     setZoomLevel(value[0]);
   };
 
+  // 重置图像位置
+  const resetImagePosition = () => {
+    setImageOffset({ x: 0, y: 0 });
+  };
+
+  // 处理图像偏移变化
+  const handleImageOffsetChange = (offsetX, offsetY) => {
+    setImageOffset({ x: offsetX, y: offsetY });
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       {/* 左侧图片预览区 */}
@@ -761,12 +916,22 @@ export default function WorkbenchPage() {
         <div className="mb-4 flex w-[420px] flex-col gap-2">
           <div className="flex items-center justify-between text-sm">
             <span>缩放: {Math.round(zoomLevel * 100)}%</span>
-            <button
-              className="text-xs text-blue-500 hover:underline"
-              onClick={() => setZoomLevel(1)}
-            >
-              重置
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                className="text-xs text-blue-500"
+                onClick={() => setZoomLevel(1)}
+              >
+                重置缩放
+              </button>
+              <span className="text-gray-300">|</span>
+              <button
+                className="text-xs text-blue-500"
+                onClick={resetImagePosition}
+                disabled={imageOffset.x === 0 && imageOffset.y === 0}
+              >
+                重置位置
+              </button>
+            </div>
           </div>
           <Slider
             defaultValue={[1]}
@@ -777,6 +942,19 @@ export default function WorkbenchPage() {
             onValueChange={handleZoomChange}
           />
         </div>
+
+        {/* 拖动提示 */}
+        {/* <div className="mb-2 flex items-center justify-center gap-1 text-xs text-gray-500">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 24 24" 
+            fill="currentColor" 
+            className="h-4 w-4"
+          >
+            <path d="M8 7a4 4 0 1 1 8 0 4 4 0 0 1-8 0Zm4-6a6 6 0 0 0-1.5 11.85v4.65a.5.5 0 0 0 1 0V16h1a.5.5 0 0 0 0-1h-1v-2.15A6 6 0 0 0 12 1Z" />
+          </svg>
+          <span>可直接用鼠标拖动调整图像位置</span>
+        </div> */}
 
         {/* 图片加载错误提示 */}
         {imageLoadError ? (
@@ -796,6 +974,9 @@ export default function WorkbenchPage() {
             ratio={selectedRatio}
             background={selectedBg}
             zoom={zoomLevel}
+            onOffsetChange={handleImageOffsetChange}
+            offsetX={imageOffset.x}
+            offsetY={imageOffset.y}
           />
         )}
 
