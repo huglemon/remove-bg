@@ -62,7 +62,7 @@ export async function GET(request) {
       }
 
       if (
-        parseFloat(params.money) * 100 === 1 ||
+        // parseFloat(params.money) * 100 === 1 ||
         parseFloat(params.money) * 100 === 990
       ) {
         // 月付会员，延长30天有效期
@@ -74,7 +74,7 @@ export async function GET(request) {
         await extendMemberExpiryDate(order.uid, 365);
       }
 
-      if (parseFloat(params.money) * 100 === 19900) {
+      if (parseFloat(params.money) * 100 === 1) {
         // 终身会员，延长100年有效期
         await extendMemberExpiryDate(order.uid, 100 * 365);
       }

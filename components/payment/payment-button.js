@@ -6,7 +6,7 @@ import { createOrder } from "@/app/actions/order";
 
 export function PaymentButton({ uid, subject = "测试商品", amount = 990 }) {
   // 验证输入参数是否有效
-  const isValidAmount = amount === 1 || amount === 990 || amount === 6600;
+  const isValidAmount = amount === 1 || amount === 990 || amount === 6600 || amount === 19900;
   const isValid = uid && isValidAmount;
   
   const [loading, setLoading] = useState(false);

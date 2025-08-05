@@ -46,7 +46,7 @@ const pricingPlans = [
       "高级编辑无水印",
       "专属客服通道",
     ],
-    amount: 19900,
+    amount: 1,
     subject: "乘风智能修图终身VIP",
   },
 ];
