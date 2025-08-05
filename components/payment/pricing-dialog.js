@@ -8,11 +8,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Check } from "lucide-react";
-import { PaymentButton } from "@/components/payment/payment-button";
 import Pricing from "@/components/landing/pricing";
 
-export default function PricingDialog({ uid, children }) {
+export default function PricingDialog({ children }) {
   const [open, setOpen] = useState(false);
 
   return (
