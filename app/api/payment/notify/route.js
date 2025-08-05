@@ -50,7 +50,8 @@ export async function GET(request) {
       if (
         parseFloat(params.money) * 100 !== 1 &&
         parseFloat(params.money) * 100 !== 990 &&
-        parseFloat(params.money) * 100 !== 6600
+        parseFloat(params.money) * 100 !== 6600 &&
+        parseFloat(params.money) * 100 !== 19900
       ) {
         return new Response("error", {
           status: 400,
@@ -71,6 +72,11 @@ export async function GET(request) {
       if (parseFloat(params.money) * 100 === 6600) {
         // 年付会员，延长365天有效期
         await extendMemberExpiryDate(order.uid, 365);
+      }
+
+      if (parseFloat(params.money) * 100 === 19900) {
+        // 终身会员，延长100年有效期
+        await extendMemberExpiryDate(order.uid, 100 * 365);
       }
 
       await updateOrderStatus({ orderNo: params.out_trade_no, status: "paid" });

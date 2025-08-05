@@ -36,6 +36,19 @@ const pricingPlans = [
     amount: 6600,
     subject: "乘风智能修图365天VIP",
   },
+  {
+    title: "终身套餐",
+    price: "¥199",
+    period: "/终身",
+    features: [
+      "批量抠图无限次",
+      "有效期100年",
+      "高级编辑无水印",
+      "专属客服通道",
+    ],
+    amount: 19900,
+    subject: "乘风智能修图终身VIP",
+  },
 ];
 
 export default async function Pricing() {
@@ -54,7 +67,7 @@ export default async function Pricing() {
           </p>
         </div>
 
-        <div className="mx-auto grid gap-8 md:grid-cols-3">
+        <div className="mx-auto grid grid-cols-2 gap-8 md:grid-cols-4">
           {pricingPlans.map((plan, index) => (
             <Card key={index} className="bg-white/80 backdrop-blur-sm">
               <CardHeader>
