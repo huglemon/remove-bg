@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "update:all": "pnpm update --interactive --latest"
+    "update:all": "bun update -i --latest"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^1.12.0",
@@ -61,6 +61,8 @@
     "webpack": "^5.99.8"
   },
   "engines": {
-    "node": "22.x"
-  }
+    "node": "22.x",
+    "bun": ">=1.3.4"
+  },
+  "packageManager": "bun@1.3.4"
 }

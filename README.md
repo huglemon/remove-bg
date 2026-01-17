@@ -36,13 +36,13 @@ git clone https://github.com/hellokaton/remove-bg.git
 2. 安装依赖：
 
 ```bash
-pnpm install
+bun install
 ```
 
 3. 启动开发服务器：
 
 ```bash
-pnpm dev
+bun dev
 ```
 
 ## 💡 使用指南
