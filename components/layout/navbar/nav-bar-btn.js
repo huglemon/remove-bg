@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { getCurrentSession } from "@/app/actions/user";
 import Link from "next/link";
-const NavbarBtn = () => {
-  const session = getCurrentSession();
+
+const NavbarBtn = async () => {
+  const { session } = await getCurrentSession();
+
   return (
     <Button size="sm">
       {session ? (
@@ -17,4 +19,5 @@ const NavbarBtn = () => {
     </Button>
   );
 };
+
 export default NavbarBtn;

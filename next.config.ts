@@ -35,8 +35,37 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  webpack: (config) => {
-    config.plugins.push(new MiniCssExtractPlugin());
+  images: {
+    domains: ["rmbg.hellokaton.me"],
+  },
+  serverExternalPackages: ["@imgly/background-removal"],
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.plugins.push(
+        new MiniCssExtractPlugin({
+          filename: "static/css/[name].[contenthash:8].css",
+          chunkFilename: "static/css/[name].[contenthash:8].chunk.css",
+        }),
+      );
+
+      const cssRule = (config.module?.rules || []).find(
+        (rule: unknown) =>
+          typeof rule === "object" &&
+          rule !== null &&
+          "test" in rule &&
+          rule.test instanceof RegExp &&
+          rule.test.test(".css"),
+      ) as { use?: unknown } | undefined;
+
+      if (cssRule && Array.isArray(cssRule.use)) {
+        cssRule.use = [
+          (MiniCssExtractPlugin as unknown as { loader: string }).loader,
+          "css-loader",
+          "postcss-loader",
+        ];
+      }
+    }
+
     return config;
   },
 };

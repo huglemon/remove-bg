@@ -1,38 +1,72 @@
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            value:
+              "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+          },
+        ],
+      },
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin",
+          },
+          {
+            key: "Cross-Origin-Embedder-Policy",
+            value: "require-corp",
+          },
+        ],
+      },
+    ];
+  },
+  images: {
+    domains: ["rmbg.hellokaton.me"],
+  },
+  serverExternalPackages: ["@imgly/background-removal"],
   webpack: (config, { isServer }) => {
-    // 仅在客户端构建时添加 mini-css-extract-plugin
     if (!isServer) {
       config.plugins.push(
         new MiniCssExtractPlugin({
-          filename: 'static/css/[name].[contenthash:8].css',
-          chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
-        })
+          filename: "static/css/[name].[contenthash:8].css",
+          chunkFilename: "static/css/[name].[contenthash:8].chunk.css",
+        }),
       );
 
-      // 更新 CSS 规则
-      const cssRule = config.module.rules.find(rule => rule.test?.test?.('.css'))
-      if (cssRule) {
+      const cssRule = (config.module?.rules || []).find(
+        (rule) =>
+          typeof rule === "object" &&
+          rule !== null &&
+          "test" in rule &&
+          rule.test instanceof RegExp &&
+          rule.test.test(".css"),
+      );
+
+      if (cssRule && Array.isArray(cssRule.use)) {
         cssRule.use = [
           MiniCssExtractPlugin.loader,
-          'css-loader',
-          'postcss-loader'
-        ]
+          "css-loader",
+          "postcss-loader",
+        ];
       }
     }
     return config;
   },
-  // 外部包配置 - 从experimental移至根级别
-  serverExternalPackages: ['@imgly/background-removal'],
-  // 其他 Next.js 配置
-  images: {
-    domains: ['rmbg.hellokaton.me'],
-  },
-  experimental: {
-    // 新的实验性选项可以放在这里
-  },
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;

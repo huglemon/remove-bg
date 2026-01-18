@@ -34,7 +34,7 @@ export function PaymentButton({ uid, subject = "测试商品", amount = 990 }) {
   }, [polling, orderNo]);
 
   // 表单提交方式支付
-  const handlePayment = () => {
+  const handlePayment = async () => {
     try {
       setLoading(true);
 
@@ -49,13 +49,17 @@ export function PaymentButton({ uid, subject = "测试商品", amount = 990 }) {
         payType: "wxpay", // 微信支付
       };
 
-      createOrder({
+      const orderResult = await createOrder({
         uid,
         amount,
         subject,
         orderNo: mchtOrderNo,
         payType: "wxpay",
       });
+
+      if (!orderResult?.success) {
+        throw new Error(orderResult?.error || "订单创建失败");
+      }
 
       // 获取表单提交数据
       const formData = createPaymentForm(orderData);
