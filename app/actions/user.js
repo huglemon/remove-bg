@@ -2,25 +2,8 @@
 
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { MongoClient, ObjectId } from "mongodb";
-
-// 创建 MongoDB 客户端和数据库实例
-const client = new MongoClient(process.env.MONGODB_URI);
-const db = client.db(process.env.MONGODB_DB_NAME);
-
-// 连接管理函数
-async function connectToDatabase() {
-  try {
-    // 检查MongoDB连接状态
-    if (!client.topology || !client.topology.isConnected()) {
-      await client.connect();
-    }
-    return { client, db };
-  } catch (error) {
-    console.error("数据库连接失败:", error);
-    throw new Error(`数据库连接失败: ${error.message}`);
-  }
-}
+import { ObjectId } from "mongodb";
+import { connectToDatabase } from "@/lib/mongodb";
 
 // 安全地将ID转换为ObjectId
 function safeObjectId(id) {
@@ -50,6 +33,8 @@ export async function registerUser(formData) {
   }
 
   try {
+    await connectToDatabase();
+
     const result = await auth.api.signUpEmail({
       body: {
         email,
@@ -86,6 +71,8 @@ export async function loginUser(formData) {
   }
 
   try {
+    await connectToDatabase();
+
     const result = await auth.api.signInEmail({
       body: {
         email,
@@ -108,6 +95,8 @@ export async function loginUser(formData) {
 // 获取当前会话
 export async function getCurrentSession() {
   try {
+    await connectToDatabase();
+
     const session = await auth.api.getSession({
       headers: await headers(),
     });
@@ -121,6 +110,8 @@ export async function getCurrentSession() {
 // 退出登录
 export async function logoutUser() {
   try {
+    await connectToDatabase();
+
     await auth.api.signOut({
       headers: await headers(),
     });

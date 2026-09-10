@@ -2,23 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { MongoClient } from "mongodb";
-
-// 创建 MongoDB 客户端和数据库实例
-const client = new MongoClient(process.env.MONGODB_URI);
-const db = client.db(process.env.MONGODB_DB_NAME);
-
-// 连接管理函数
-async function connectToDatabase() {
-  try {
-    if (!client.topology || !client.topology.isConnected()) {
-      await client.connect();
-    }
-    return { client, db };
-  } catch (error) {
-    throw new Error(`数据库连接失败: ${error.message}`);
-  }
-}
+import { connectToDatabase } from "@/lib/mongodb";
 
 export async function createOrder({ uid, amount, subject, orderNo, payType }) {
   console.log(uid, amount, subject, orderNo, payType);
@@ -30,6 +14,8 @@ export async function createOrder({ uid, amount, subject, orderNo, payType }) {
     if (!subject) return { success: false, error: "订单主题不能为空" };
     if (!orderNo) return { success: false, error: "订单号不能为空" };
     if (!payType) return { success: false, error: "支付类型不能为空" };
+
+    await connectToDatabase();
 
     // 验证用户会话
     const session = await auth.api.getSession({
@@ -93,6 +79,8 @@ export async function getUserOrders({ uid }) {
     console.log("getUserOrders 接收到的 uid:", uid);
 
     if (!uid) return { success: false, error: "用户ID不能为空" };
+
+    await connectToDatabase();
 
     // 验证用户会话
     const session = await auth.api.getSession({
